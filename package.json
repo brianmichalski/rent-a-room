@@ -10,10 +10,15 @@
     "test": "jest"
   },
   "dependencies": {
+    "@prisma/client": "^5.21.0",
+    "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "next": "14.2.15",
     "next-api-decorators": "^2.0.2",
+    "next-auth": "^4.24.8",
     "path-to-regexp": "^6.3.0",
+    "prisma": "^5.21.0",
     "react": "^18",
     "react-dom": "^18",
     "rent-a-room": "file:"
@@ -23,6 +28,7 @@
     "@babel/plugin-proposal-decorators": "^7.25.7",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

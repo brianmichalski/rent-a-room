@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  id         Int         @id @default(autoincrement())
+  type       AddressType
+  street     String      @db.VarChar(100)
+  number     Int
+  other      String?     @db.VarChar(100)
+  postalCode String      @db.Char(6)
+  cityId     Int
+  city       City        @relation(fields: [cityId], references: [id])
+
+  User User?
+  Room Room?
+
+  @@map("address")
+}
+
+model City {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  provinceId Int
+  province   Province  @relation(fields: [provinceId], references: [id])
+  Address    Address[]
+
+  @@map("city")
+}
+
+model Province {
+  id           Int    @id @default(autoincrement())
+  name         String @db.VarChar(50)
+  abbreviation String @db.Char(2)
+  cities       City[]
+
+  @@map("province")
+}
+
+model Room {
+  id            Int           @id @default(autoincrement())
+  roomType      RoomType
+  bathroomType  BathroomType
+  gender        Gender
+  ownerId       Int
+  owner         User          @relation(fields: [ownerId], references: [id])
+  addressId     Int?          @unique
+  address       Address?      @relation(fields: [addressId], references: [id])
+  description   String        @db.Text
+  rentPrice     Float         @db.DoublePrecision()
+  size          Int
+  numberOfRooms Int
+  isRented      Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  roomPictures  RoomPicture[]
+
+  @@map("room")
+}
+
+model RoomPicture {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  url       String   @db.VarChar(255)
+  isCover   Boolean  @default(false)
+  order     Int
+  createdAt DateTime @default(now())
+
+  @@map("room_picture")
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  addressId           Int?      @unique
+  address             Address?  @relation(fields: [addressId], references: [id])
+  firstName           String    @db.VarChar(100)
+  lastName            String    @db.VarChar(100)
+  email               String    @unique
+  password            String    @db.VarChar(128) // SHA512
+  phone               String?   @db.VarChar(20)
+  profilePictureUrl   String?   @db.VarChar(255)
+  isOwner             Boolean   @default(false)
+  isLocked            Boolean   @default(false)
+  lastLoginAttempt    DateTime?
+  failedLoginAttempts Int?
+  createdAt           DateTime  @default(now())
+  rooms               Room[]
+
+  @@map("user")
+}
+
+enum AddressType {
+  R
+  B
+}
+
+enum RoomType {
+  I
+  S
+}
+
+enum BathroomType {
+  E
+  S
+}
+
+enum Gender {
+  F
+  M
+  X
+}
