@@ -10,6 +10,7 @@ declare module 'next' {
   }
 }
 
+// source: https://github.com/instantcommerce/next-api-decorators/blob/master/examples/with-next-auth/pages/api/users/%5B%5B...params%5D%5D.ts
 export const NextAuthGuard = createMiddlewareDecorator(async (req: NextApiRequest, _res: NextApiResponse, next: NextFunction) => {
   const token = await getToken({ req, secret });
   if (!token || !token.name) {
