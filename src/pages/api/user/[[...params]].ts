@@ -9,17 +9,10 @@ import {
   ValidationPipe,
   createHandler
 } from 'next-api-decorators';
+import { type JWT } from 'next-auth/jwt';
+import { GetToken, NextAuthGuard } from '../../../app/decorators';
 import { CreateUserInput, UpdatePropertyOwnerInput } from '../../../app/dto';
 import prisma from '../../../lib/prisma';
-import { GetToken } from '../../../app/decorators/GetToken';
-import { type JWT } from 'next-auth/jwt';
-import NextAuthGuard from '../../../app/decorators/NextAuthGuard';
-
-declare module 'next' {
-  interface NextApiRequest {
-    user?: { name: string }
-  }
-}
 
 class UserRouter {
   private prisma = prisma;

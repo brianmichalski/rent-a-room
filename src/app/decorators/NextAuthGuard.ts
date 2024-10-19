@@ -4,7 +4,13 @@ import { getToken } from "next-auth/jwt";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-const NextAuthGuard = createMiddlewareDecorator(async (req: NextApiRequest, _res: NextApiResponse, next: NextFunction) => {
+declare module 'next' {
+  interface NextApiRequest {
+    user?: { name: string }
+  }
+}
+
+export const NextAuthGuard = createMiddlewareDecorator(async (req: NextApiRequest, _res: NextApiResponse, next: NextFunction) => {
   const token = await getToken({ req, secret });
   if (!token || !token.name) {
     throw new UnauthorizedException();
@@ -13,5 +19,3 @@ const NextAuthGuard = createMiddlewareDecorator(async (req: NextApiRequest, _res
   req.user = { name: token.name };
   next();
 });
-
-export default NextAuthGuard;
