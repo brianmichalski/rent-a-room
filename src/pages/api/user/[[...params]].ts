@@ -12,7 +12,7 @@ import {
 import { type JWT } from 'next-auth/jwt';
 import { GetToken, NextAuthGuard } from '../../../app/decorators';
 import { CreateUserInput, UpdatePropertyOwnerInput } from '../../../app/dto';
-import prisma from '../../../lib/prisma';
+import prisma from '../../../../prisma/client';
 
 class UserRouter {
   private prisma = prisma;

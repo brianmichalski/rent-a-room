@@ -1,6 +1,6 @@
 // types/next-auth.d.ts
-import NextAuth, { DefaultSession } from "next-auth"
-import { JWT } from "next-auth/jwt"
+import { DefaultSession } from "next-auth";
+import "next-auth/jwt";
 
 declare module "next-auth" {
   /**
@@ -9,13 +9,11 @@ declare module "next-auth" {
   interface Session {
     user: {
       /** The user's role. */
-      id: number,
-      role: string
+      id: number
     } & DefaultSession["user"]
   }
   interface User {
-    id: number,
-    role: string
+    id: number
   }
 }
 
@@ -23,7 +21,6 @@ declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
   interface JWT {
     /** The user's role */
-    id: number,
-    role: string
+    id: number
   }
 }
