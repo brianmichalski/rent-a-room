@@ -1,24 +1,19 @@
 import { User } from '@prisma/client';
 import { hash } from 'bcrypt';
-import { NextApiRequest, NextApiResponse } from 'next';
 import {
   Body,
   HttpCode,
-  NextFunction,
   NotFoundException,
-  Param,
-  ParseNumberPipe,
   Post,
   Put,
-  UnauthorizedException,
   ValidationPipe,
-  createHandler,
-  createMiddlewareDecorator
+  createHandler
 } from 'next-api-decorators';
-import { getToken } from 'next-auth/jwt';
-import { Authorization } from '../../../app/decorators/Authorization';
-import { CreateUserInput, LoginInput, UpdatePropertyOwnerInput } from '../../../app/dto';
+import { CreateUserInput, UpdatePropertyOwnerInput } from '../../../app/dto';
 import prisma from '../../../lib/prisma';
+import { GetToken } from '../../../app/decorators/GetToken';
+import { type JWT } from 'next-auth/jwt';
+import NextAuthGuard from '../../../app/decorators/NextAuthGuard';
 
 declare module 'next' {
   interface NextApiRequest {
@@ -26,19 +21,6 @@ declare module 'next' {
   }
 }
 
-const secret = process.env.NEXTAUTH_SECRET;
-
-const NextAuthGuard = createMiddlewareDecorator(async (req: NextApiRequest, _res: NextApiResponse, next: NextFunction) => {
-  const token = await getToken({ req, secret });
-  if (!token || !token.name) {
-    throw new UnauthorizedException();
-  }
-
-  req.user = { name: token.name };
-  next();
-});
-
-@NextAuthGuard()
 class UserRouter {
   private prisma = prisma;
 
@@ -66,19 +48,14 @@ class UserRouter {
   }
 
   // PUT /api/users/:id (update one)
-  @Put('/:id/property-owner')
+  @NextAuthGuard()
+  @Put('/property-owner')
   @HttpCode(201)
   public async updatePropertyOwner(
-    @Param('id', ParseNumberPipe) id: number,
     @Body(ValidationPipe) body: UpdatePropertyOwnerInput,
-    @Authorization() authorization?: string
+    @GetToken() token: JWT
   ): Promise<User> {
-    console.log(authorization);
-
-    // TODO: check if the user matches with the logged one
-    const user = await this.findUserById(id);
-
-    this.prisma.user.update({
+    await this.prisma.user.update({
       data: {
         profilePictureUrl: '',
         phone: body.phone,
@@ -98,26 +75,10 @@ class UserRouter {
         }
       },
       where: {
-        id: id
+        id: token.id
       }
     });
-    return user;
-  }
-
-  // POST /api/users (create one)
-  @Post()
-  @HttpCode(200)
-  public async login(@Body(ValidationPipe) body: LoginInput): Promise<boolean> {
-    const newUser = await prisma.user.findUnique({
-      where:
-      {
-        email: body.email
-      }
-    });
-    if (newUser) {
-
-    }
-    return true;
+    return await this.findUserById(token.id);
   }
 }
 
