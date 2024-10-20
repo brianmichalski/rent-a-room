@@ -9,7 +9,6 @@ describe('CreateRoomPictureInput Class Fields Validation', () => {
     createRoomPictureInput.roomId = 1;
     createRoomPictureInput.isCover = true;
     createRoomPictureInput.order = 1;
-    createRoomPictureInput.url = 'public/img/rooms/image.jpg';
   });
 
   it('should validate successfully with correct data', async () => {
