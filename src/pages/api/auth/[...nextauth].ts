@@ -1,7 +1,7 @@
-import { compare } from "bcrypt";
 import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../../prisma/client";
+import { UserService } from "../../../app/service/user.service";
 
 // Define types for the credentials and user
 interface Credentials {
@@ -19,22 +19,10 @@ export const authorizeUser = async (
   }
 
   const { email, password } = credentials;
+  const userService = new UserService(prismaClient);
 
-  // Fetch the user from the database using Prisma
-  const user = await prismaClient.user.findUnique({
-    where: { email },
-  });
-
-  // If user doesn't exist, return null
+  const user = await userService.login(email, password);
   if (!user) {
-    return null;
-  }
-
-  // Compare the hashed password with the user's provided password
-  const isValidPassword = await compare(password, user.password);
-
-  // If password doesn't match, return null
-  if (!isValidPassword) {
     return null;
   }
 

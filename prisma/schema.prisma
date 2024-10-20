@@ -91,9 +91,8 @@ model User {
   phone               String?   @db.VarChar(20)
   profilePictureUrl   String?   @db.VarChar(255)
   isOwner             Boolean   @default(false)
-  isLocked            Boolean   @default(false)
   lastLoginAttempt    DateTime?
-  failedLoginAttempts Int?
+  failedLoginAttempts Int       @default(0)
   createdAt           DateTime  @default(now())
   rooms               Room[]
 
@@ -101,22 +100,22 @@ model User {
 }
 
 enum AddressType {
-  R
-  B
+  R // residential
+  B // business
 }
 
 enum RoomType {
-  I
-  S
+  I // individual
+  S // shared
 }
 
 enum BathroomType {
-  E
-  S
+  E // ensuite
+  S // shared
 }
 
 enum Gender {
-  F
-  M
-  X
+  F // female
+  M // male
+  X // mixed
 }
