@@ -4,14 +4,12 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
-  Matches,
-  MaxLength,
   Min
 } from 'class-validator';
+import { AddressInput } from '../address.input';
 
-export class CreateRoomInput {
+export class CreateRoomInput extends AddressInput {
   @IsEnum(RoomType)
   public roomType!: RoomType;
 
@@ -36,24 +34,4 @@ export class CreateRoomInput {
   @IsInt()
   @Min(1)
   public numberOfRooms!: number;
-
-  // Address fields
-  @IsNotEmpty()
-  @MaxLength(100)
-  public street!: string;
-
-  @IsNotEmpty()
-  public number!: number;
-
-  @IsOptional()
-  @MaxLength(100)
-  public other?: string;
-
-  @IsNotEmpty()
-  @MaxLength(6)
-  @Matches(/([a-z]\d){3}/i)
-  public postalCode!: string;
-
-  @IsNotEmpty()
-  public cityId!: number;
 }

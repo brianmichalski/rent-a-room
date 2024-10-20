@@ -69,21 +69,20 @@ export class RoomService {
         order: { increment: 1 }
       },
     });
-    // unset the current cover
-    const unsetPictureCover = this.prisma.roomPicture.updateMany({
-      where: {
-        roomId: roomId,
-        isCover: true
-      },
-      data: {
-        isCover: false
-      },
-    });
 
     // prepare the batch for the transaction
     const commands = [];
-    // if the picture is the new cover, unset the previous one
     if (data.isCover) {
+      // if the picture is the new cover, unset the previous one
+      const unsetPictureCover = this.prisma.roomPicture.updateMany({
+        where: {
+          roomId: roomId,
+          isCover: true
+        },
+        data: {
+          isCover: false
+        },
+      });
       commands.push(unsetPictureCover);
     }
     commands.push(adjustPicturesOrder);
