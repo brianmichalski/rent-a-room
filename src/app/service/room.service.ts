@@ -45,7 +45,8 @@ export class RoomService {
     return newRoom;
   }
 
-  public async createRoomPicture(roomId: number, data: CreateRoomPictureInput): Promise<RoomPicture> {
+  public async createRoomPicture(data: CreateRoomPictureInput): Promise<RoomPicture> {
+    const roomId = data.roomId;
     const createPicture = this.prisma.roomPicture.create({
       data: {
         order: data.order,
