@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsStrongPassword, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsStrongPassword, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserInput {
   @IsNotEmpty()
@@ -16,6 +16,6 @@ export class CreateUserInput {
 
   @IsStrongPassword({ minLength: 8, minLowercase: 1, minNumbers: 1, minSymbols: 1, minUppercase: 1 })
   @IsNotEmpty()
-  @MaxLength(128)
+  @MinLength(8)
   public password!: string;
 }
