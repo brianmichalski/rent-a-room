@@ -8,7 +8,7 @@ import {
   createHandler
 } from 'next-api-decorators';
 import { type JWT } from 'next-auth/jwt';
-import { GetToken, NextAuthGuard } from '../../../app/decorators';
+import { GetToken, NextAuthGuard } from '../../../decorators';
 import { CreateUserInput, UpdatePropertyOwnerInput } from '../../../app/dto';
 import { UserService } from '../../../app/service/user.service';
 import prisma from '../../../../prisma/client';
@@ -28,7 +28,7 @@ class UserRouter {
     return await this.userService.createUser(body);
   }
 
-  // PUT /api/users/:id (update one)
+  // PUT /api/users/property-owner (update account)
   @NextAuthGuard()
   @Put('/property-owner')
   @HttpCode(201)
