@@ -11,7 +11,7 @@ As of now, the project includes:
 
 ### Database
 1. Start the Docker container using the `docker-compose.yml` file located at the root directory: `docker compose up`. This will launch Postgres, exposing port 5432 to localhost.
-2. Create the database structure by running: `npm prisma db push`.
+2. Create the database structure by running: `npx prisma db push`.
 
 ### Node
 1. Install dependencies: `npm install`.
