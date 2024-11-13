@@ -13,8 +13,8 @@ export class UserService {
   }
 
   private checkIfUserIsBlocked(user: User) {
-    const maxLoginAttemps = Number(process.env.USER_MAX_LOGIN_ATTEMPS);
-    if ((user.failedLoginAttempts ?? 0) >= maxLoginAttemps) {
+    const maxLoginAttempts = Number(process.env.USER_MAX_LOGIN_ATTEMPS);
+    if ((user.failedLoginAttempts ?? 0) >= maxLoginAttempts) {
       const now = new Date();
       const userBlockTime = Number(process.env.USER_BLOCK_TIME);
       const lastAttemptInMinutes = differenceInMinutes(now, user.lastLoginAttempt ?? now);

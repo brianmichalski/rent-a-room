@@ -2,10 +2,12 @@ import { IsEmail, IsNotEmpty, IsStrongPassword, MaxLength, MinLength } from 'cla
 
 export class CreateUserInput {
   @IsNotEmpty()
+  @MinLength(2)
   @MaxLength(100)
   public firstName!: string;
 
   @IsNotEmpty()
+  @MinLength(2)
   @MaxLength(100)
   public lastName!: string;
 

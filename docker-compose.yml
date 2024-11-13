@@ -5,8 +5,10 @@ services:
     environment:
       POSTGRES_USER: 'rentARoom'
       POSTGRES_PASSWORD: '123456'
+      POSTGRES_DB: 'rentARoom'  # Default database that will be created initially
     volumes:
-      - pgdata:/var/lib/postgresql/data 
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init script to create additional DBs
     ports:
       - 5432:5432
 
@@ -15,6 +17,6 @@ services:
     restart: always
     ports:
       - 8080:8080
- 
+
 volumes:
   pgdata:
