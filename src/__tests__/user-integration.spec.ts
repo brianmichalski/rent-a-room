@@ -14,6 +14,7 @@ describe('User Registration and Login Integration Tests', () => {
 
   beforeEach(async () => {
     // Clear user data before each test
+    await prisma.room.deleteMany();
     await prisma.user.deleteMany();
   });
 

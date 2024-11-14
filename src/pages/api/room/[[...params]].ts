@@ -12,7 +12,7 @@ import { CreateRoomInput } from '../../../app/dto/room/createRoom.input';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
 
-class RooomRouter {
+class RoomRouter {
   protected roomService: RoomService;
 
   constructor() {
@@ -30,4 +30,4 @@ class RooomRouter {
   }
 }
 
-export default createHandler(RooomRouter);
+export default createHandler(RoomRouter);

@@ -2,6 +2,7 @@ import { AddressType, Room, RoomPicture } from "@prisma/client";
 import prisma from "../../../prisma/client";
 import { CreateRoomInput } from "../dto/room/createRoom.input";
 import { CreateRoomPictureInput } from "../dto/room/createRoomPicture.input";
+import { BadRequestException } from "next-api-decorators";
 
 export class RoomService {
   private prisma;
@@ -11,6 +12,11 @@ export class RoomService {
   }
 
   public async createRoom(ownerUserId: number, data: CreateRoomInput): Promise<Room> {
+    const user = await this.prisma.user.findFirst({ where: { id: ownerUserId } });
+    if (!user?.isOwner) {
+      throw new BadRequestException("User is not a property owner");
+    }
+
     // TODO: check address duplicity
     const newRoom = await this.prisma.room.create({
       data: {
