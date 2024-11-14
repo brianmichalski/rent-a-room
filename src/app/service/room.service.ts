@@ -1,5 +1,5 @@
 import { AddressType, Room, RoomPicture } from "@prisma/client";
-import { BadRequestException } from "next-api-decorators";
+import { BadRequestException, NotFoundException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { CreateRoomInput } from "../dto/room/createRoom.input";
 import { CreateRoomPictureInput } from "../dto/room/createRoomPicture.input";
@@ -18,34 +18,7 @@ export class RoomService {
 
     // TODO: check address duplicity
     const newRoom = await this.prisma.room.create({
-      data: {
-        bathroomType: data.bathroomType,
-        description: data.description,
-        gender: data.gender,
-        numberOfRooms: data.numberOfRooms,
-        rentPrice: data.rentPrice,
-        roomType: data.roomType,
-        size: data.size,
-        owner: {
-          connect: {
-            id: data.ownerId
-          }
-        },
-        address: {
-          create: {
-            type: AddressType.R,
-            street: data.street,
-            number: data.number,
-            other: data.other,
-            postalCode: data.postalCode.toUpperCase(),
-            city: {
-              connect: {
-                id: data.cityId
-              }
-            }
-          }
-        }
-      }
+      data: this.parseInput(data)
     });
     return newRoom;
   }
@@ -62,6 +35,14 @@ export class RoomService {
       data: this.parseInput(data)
     });
     return updatedRoom;
+  }
+
+  public async deleteRoom(roomId: number, ownerId: number): Promise<boolean> {
+    await this.checkOwnerPreconditions(ownerId, roomId);
+    const result = await this.prisma.room.delete({
+      where: { id: roomId }
+    });
+    return (result != null);
   }
 
   public async createRoomPicture(data: CreateRoomPictureInput): Promise<RoomPicture> {
@@ -135,7 +116,7 @@ export class RoomService {
       }
     );
     if (!room) {
-      throw new BadRequestException("Room not found");
+      throw new NotFoundException("Room not found");
     }
     if (room.owner?.id !== ownerId) {
       throw new BadRequestException("Room belongs to a different user");

@@ -1,7 +1,9 @@
 import { Room } from '@prisma/client';
 import {
   Body,
+  Delete,
   HttpCode,
+  Param,
   Post,
   Put,
   ValidationPipe,
@@ -43,6 +45,17 @@ class RoomRouter {
 
     body.ownerId = token.id;
     return await this.roomService.updateRoom(body);
+  }
+
+  // DELETE /api/room/:id (delete one)
+  @NextAuthGuard()
+  @Delete("/:id")
+  @HttpCode(204)
+  public async deleteRoom(
+    @Param("id") roomId: number,
+    @GetToken() token: JWT): Promise<boolean> {
+
+    return await this.roomService.deleteRoom(Number(roomId), token.id);
   }
 }
 
