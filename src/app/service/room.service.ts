@@ -3,6 +3,7 @@ import { BadRequestException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { CreateRoomInput } from "../dto/room/createRoom.input";
 import { CreateRoomPictureInput } from "../dto/room/createRoomPicture.input";
+import { UpdateRoomInput } from "../dto/room/updateRoom.input";
 
 export class RoomService {
   private prisma;
@@ -13,7 +14,7 @@ export class RoomService {
 
   public async createRoom(data: CreateRoomInput): Promise<Room> {
 
-    await this.checkOwner(data.ownerId);
+    await this.checkOwnerPreconditions(data.ownerId);
 
     // TODO: check address duplicity
     const newRoom = await this.prisma.room.create({
@@ -49,9 +50,23 @@ export class RoomService {
     return newRoom;
   }
 
+  public async updateRoom(data: UpdateRoomInput): Promise<Room> {
+
+    await this.checkOwnerPreconditions(data.ownerId, data.roomId);
+
+    // TODO: check address duplicity
+    const updatedRoom = await this.prisma.room.update({
+      where: {
+        id: data.roomId
+      },
+      data: this.parseInput(data)
+    });
+    return updatedRoom;
+  }
+
   public async createRoomPicture(data: CreateRoomPictureInput): Promise<RoomPicture> {
 
-    await this.checkOwner(data.ownerId, data.roomId);
+    await this.checkOwnerPreconditions(data.ownerId, data.roomId);
 
     const roomId = data.roomId;
     const createPicture = this.prisma.roomPicture.create({
@@ -103,7 +118,7 @@ export class RoomService {
     return createdPicture as RoomPicture;
   }
 
-  private async checkOwner(ownerId: number, roomId?: number) {
+  private async checkOwnerPreconditions(ownerId: number, roomId?: number) {
     const user = await this.prisma.user.findFirst({ where: { id: ownerId } });
     if (!user?.isOwner) {
       throw new BadRequestException("User is not a property owner");
