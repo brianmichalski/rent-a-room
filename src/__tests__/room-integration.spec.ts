@@ -41,32 +41,6 @@ const validOwnerData = {
   postalCode: "A1B2C9",
   cityId: 0,
 };
-// const validRoomData: UpdateRoomInput | null = {
-//   roomType: "S",
-//   bathroomType: "E",
-//   gender: "X",
-//   description: "A cozy single room with a private bathroom",
-//   rentPrice: 850.50,
-//   size: 15,
-//   numberOfRooms: 1,
-//   street: "Maple Street",
-//   number: 456,
-//   other: "Near the central park",
-//   postalCode: "A1B2C3",
-//   cityId: 0,
-//   ownerId: 0,
-//   roomId: 0
-// };
-
-// const validOwnerData = {
-//   type: "B",
-//   phone: "+15198003254",
-//   street: "King Street",
-//   number: 999,
-//   other: "Office",
-//   postalCode: "A1B2C9",
-//   cityId: 0,
-// };
 
 const newRoomDescription = faker.lorem.paragraph();
 
