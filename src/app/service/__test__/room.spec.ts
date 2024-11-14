@@ -1,4 +1,4 @@
-import { AddressType, BathroomType, Gender, Room, RoomPicture, RoomType } from '@prisma/client';
+import { AddressType, BathroomType, Gender, Room, RoomPicture, RoomType, User } from '@prisma/client';
 import prisma from '../../../../prisma/client';
 import { CreateRoomInput } from '../../dto/room/createRoom.input';
 import { CreateRoomPictureInput } from '../../dto/room/createRoomPicture.input';
@@ -7,21 +7,30 @@ import { RoomService } from '../room.service';
 // Jest mock functions
 jest.mock("../../../../prisma/client", () => ({
   room: {
-    create: jest.fn()
+    create: jest.fn(),
+    findFirst: jest.fn()
   },
   roomPicture: {
     create: jest.fn(),
-    updateMany: jest.fn()
+    updateMany: jest.fn(),
+  },
+  user: {
+    findFirst: jest.fn()
   },
   $transaction: jest.fn()
 }));
 
 describe('RoomService', () => {
   let roomService: RoomService;
+  const ownerUser = {
+    id: 1,
+    isOwner: true
+  } as User;
 
   beforeEach(() => {
     jest.clearAllMocks();
     roomService = new RoomService(prisma);
+    (prisma.user.findFirst as jest.Mock).mockResolvedValue(ownerUser);
   });
 
   describe('createRoom', () => {
@@ -31,7 +40,6 @@ describe('RoomService', () => {
       (prisma.room.create as jest.Mock).mockResolvedValue(mockRoom);
 
       // Prepare input data
-      const ownerUserId = 1;
       const createRoomInput: CreateRoomInput = {
         bathroomType: BathroomType.E,
         description: 'Nice room',
@@ -44,10 +52,11 @@ describe('RoomService', () => {
         number: 123,
         other: 'Near the park',
         postalCode: 'A1B2C3',
-        cityId: 1
+        cityId: 1,
+        ownerId: ownerUser.id
       };
 
-      const result = await roomService.createRoom(ownerUserId, createRoomInput);
+      const result = await roomService.createRoom(createRoomInput);
 
       expect(prisma.room.create).toHaveBeenCalledWith({
         data: {
@@ -59,7 +68,7 @@ describe('RoomService', () => {
           roomType: createRoomInput.roomType,
           size: createRoomInput.size,
           owner: {
-            connect: { id: ownerUserId }
+            connect: { id: ownerUser.id }
           },
           address: {
             create: {
@@ -86,12 +95,16 @@ describe('RoomService', () => {
       (prisma.roomPicture.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
       (prisma.$transaction as jest.Mock).mockResolvedValue([{}, {}, mockPicture]);
 
+      const roomId = 9;
+
+      (prisma.room.findFirst as jest.Mock).mockResolvedValue({ id: roomId, owner: { id: ownerUser.id } });
       // Prepare input data
       const createRoomPictureInput: CreateRoomPictureInput = {
-        roomId: 9,
+        roomId: roomId,
         isCover: true,
         order: 1,
-        url: 'public/img/rooms/image.jpg'
+        url: 'public/img/rooms/image.jpg',
+        ownerId: ownerUser.id
       };
 
       const result = await roomService.createRoomPicture(createRoomPictureInput);
@@ -126,12 +139,16 @@ describe('RoomService', () => {
       (prisma.roomPicture.create as jest.Mock).mockResolvedValue(mockPicture);
       (prisma.roomPicture.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
       (prisma.$transaction as jest.Mock).mockResolvedValue([{}, mockPicture]);
+
+      const roomId = 1;
+      (prisma.room.findFirst as jest.Mock).mockResolvedValue({ id: roomId, owner: { id: ownerUser.id } });
       // Prepare input data
       const createRoomPictureInput: CreateRoomPictureInput = {
-        roomId: 1,
+        roomId: roomId,
         isCover: false,
         order: 2,
-        url: 'public/img/rooms/image2.jpg'
+        url: 'public/img/rooms/image2.jpg',
+        ownerId: ownerUser.id
       };
 
       const result = await roomService.createRoomPicture(createRoomPictureInput);
@@ -160,7 +177,8 @@ describe('RoomService', () => {
       roomId: 1,
       isCover: true,
       order: 2,
-      url: 'public/img/rooms/image2.jpg'
+      url: 'public/img/rooms/image2.jpg',
+      ownerId: ownerUser.id
     };
 
     const result = await roomService.createRoomPicture(createRoomPictureInput);

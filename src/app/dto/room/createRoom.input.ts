@@ -1,4 +1,4 @@
-import { BathroomType, Gender, RoomType } from '@prisma/client'; // Adjust import based on your project structure
+import { BathroomType, Gender, RoomType } from '@prisma/client';
 import {
   IsEnum,
   IsInt,
@@ -34,4 +34,7 @@ export class CreateRoomInput extends AddressInput {
   @IsInt()
   @Min(1)
   public numberOfRooms!: number;
+
+  // filled by the API with the user id from the session token
+  public ownerId!: number;
 }

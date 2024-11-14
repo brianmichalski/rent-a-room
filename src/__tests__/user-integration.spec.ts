@@ -4,6 +4,7 @@ import prisma from '../../prisma/client';
 import { CreateUserInput } from '../app/dto';
 import { authorizeUser } from '../pages/api/auth/[...nextauth]';
 import createHandler from '../pages/api/user/[[...params]]';
+import checkMissingFields from '../utils/test-utils';
 
 const maxLoginAttempts = Number(process.env.USER_MAX_LOGIN_ATTEMPS);
 
@@ -87,6 +88,7 @@ describe('User Registration and Login Integration Tests', () => {
         body: registrationData as CreateUserInput,
       });
 
+      // Perform the API request for user creation
       await createHandler(reqCreate, resCreate);
 
       // Check registration status
@@ -97,17 +99,8 @@ describe('User Registration and Login Integration Tests', () => {
         const responseData = resCreate._getJSONData();
         // Check if the response contains errors
         expect(responseData).toHaveProperty('errors');
-        const errors: string[] = responseData.errors;
         // Check that each missing field has a validation error
-        const missingFields: string[] = [];
-        (validationErrorFields as string[]).forEach((key: string) => {
-          if (!errors.some((error: string) => error.includes(key))) {
-            missingFields.push(key);
-          }
-        });
-        if (missingFields.length > 0) {
-          throw new Error(`Expected field(s) '${missingFields.join(', ')}' to be validated.`);
-        }
+        checkMissingFields(validationErrorFields as string[], responseData.errors);
       }
       const testThatUserIsBlocked = Number(loginAttempts) > maxLoginAttempts;
 

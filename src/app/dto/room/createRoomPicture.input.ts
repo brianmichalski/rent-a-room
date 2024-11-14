@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, Min } from 'class-validator';
+import { IsBoolean, IsEmpty, IsInt, IsNotEmpty, IsOptional, Min } from 'class-validator';
 
 export class CreateRoomPictureInput {
   @IsNotEmpty()
@@ -12,5 +12,8 @@ export class CreateRoomPictureInput {
   @Min(1)
   public order!: number;
 
+  @IsEmpty()
   public url!: string;
+
+  public ownerId!: number;
 }

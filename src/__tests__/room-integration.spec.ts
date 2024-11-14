@@ -11,7 +11,7 @@ import { CreateRoomInput } from '../app/dto/room/createRoom.input';
 jest.mock('next-auth/jwt');
 const mockedGetToken = getToken as jest.MockedFunction<typeof getToken>;
 
-describe("Room API - Authentication Required", () => {
+describe("Room API - Property onwer account upgrade & Room creation", () => {
   const validRoomData = {
     roomType: "S",
     bathroomType: "E",
@@ -25,6 +25,7 @@ describe("Room API - Authentication Required", () => {
     other: "Near the central park",
     postalCode: "A1B2C3",
     cityId: 0,
+    ownerId: 0
   };
 
   const validOwnerData = {
@@ -41,8 +42,6 @@ describe("Room API - Authentication Required", () => {
 
   beforeAll(async () => {
     await prisma.$connect();
-    await prisma.room.deleteMany();
-    await prisma.user.deleteMany();
 
     const province = await prisma.province.create({
       data: { name: 'Ontario', abbreviation: 'ON' }
@@ -52,6 +51,12 @@ describe("Room API - Authentication Required", () => {
     });
     validRoomData.cityId = city.id;
     validOwnerData.cityId = city.id;
+  });
+
+  beforeEach(async() => {
+    mockedGetToken.mockReset();
+    await prisma.room.deleteMany();
+    await prisma.user.deleteMany();
 
     ownerUser = await prisma.user.create({
       data: {
@@ -61,10 +66,6 @@ describe("Room API - Authentication Required", () => {
         password: 'StrongPass!1',
       }
     });
-  });
-
-  beforeEach(() => {
-    mockedGetToken.mockReset();
   });
 
   afterAll(async () => {
@@ -129,6 +130,7 @@ describe("Room API - Authentication Required", () => {
         expect(resUpgrade._getStatusCode()).toBe(201);
       }
 
+      (roomData as CreateRoomInput).ownerId = (token as JWT)?.id;
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
         url: '/api/room',

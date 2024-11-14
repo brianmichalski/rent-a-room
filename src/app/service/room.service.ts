@@ -1,8 +1,8 @@
 import { AddressType, Room, RoomPicture } from "@prisma/client";
+import { BadRequestException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { CreateRoomInput } from "../dto/room/createRoom.input";
 import { CreateRoomPictureInput } from "../dto/room/createRoomPicture.input";
-import { BadRequestException } from "next-api-decorators";
 
 export class RoomService {
   private prisma;
@@ -11,11 +11,9 @@ export class RoomService {
     this.prisma = _prisma;
   }
 
-  public async createRoom(ownerUserId: number, data: CreateRoomInput): Promise<Room> {
-    const user = await this.prisma.user.findFirst({ where: { id: ownerUserId } });
-    if (!user?.isOwner) {
-      throw new BadRequestException("User is not a property owner");
-    }
+  public async createRoom(data: CreateRoomInput): Promise<Room> {
+
+    await this.checkOwner(data.ownerId);
 
     // TODO: check address duplicity
     const newRoom = await this.prisma.room.create({
@@ -29,7 +27,7 @@ export class RoomService {
         size: data.size,
         owner: {
           connect: {
-            id: ownerUserId
+            id: data.ownerId
           }
         },
         address: {
@@ -52,6 +50,9 @@ export class RoomService {
   }
 
   public async createRoomPicture(data: CreateRoomPictureInput): Promise<RoomPicture> {
+
+    await this.checkOwner(data.ownerId, data.roomId);
+
     const roomId = data.roomId;
     const createPicture = this.prisma.roomPicture.create({
       data: {
@@ -100,5 +101,60 @@ export class RoomService {
     // if data.isCover, the transaction will return 3 results. Otherwise, it will return 2.
     const createdPicture = commands.length === 3 ? result[2] : result[1];
     return createdPicture as RoomPicture;
+  }
+
+  private async checkOwner(ownerId: number, roomId?: number) {
+    const user = await this.prisma.user.findFirst({ where: { id: ownerId } });
+    if (!user?.isOwner) {
+      throw new BadRequestException("User is not a property owner");
+    }
+    if (!roomId) {
+      return;
+    }
+    const room = await this.prisma.room.findFirst(
+      {
+        include: {
+          owner: true
+        },
+        where: { id: roomId },
+      }
+    );
+    if (!room) {
+      throw new BadRequestException("Room not found");
+    }
+    if (room.owner?.id !== ownerId) {
+      throw new BadRequestException("Room belongs to a different user");
+    }
+  }
+
+  private parseInput(data: CreateRoomInput): Room {
+    return {
+      bathroomType: data.bathroomType,
+      description: data.description,
+      gender: data.gender,
+      numberOfRooms: data.numberOfRooms,
+      rentPrice: data.rentPrice,
+      roomType: data.roomType,
+      size: data.size,
+      owner: {
+        connect: {
+          id: data.ownerId
+        }
+      },
+      address: {
+        create: {
+          type: AddressType.R,
+          street: data.street,
+          number: data.number,
+          other: data.other,
+          postalCode: data.postalCode.toUpperCase(),
+          city: {
+            connect: {
+              id: data.cityId
+            }
+          }
+        }
+      }
+    } as unknown as Room;
   }
 }

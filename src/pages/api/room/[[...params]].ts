@@ -26,7 +26,9 @@ class RoomRouter {
   public async createRoom(
     @Body(ValidationPipe) body: CreateRoomInput,
     @GetToken() token: JWT): Promise<Room> {
-    return await this.roomService.createRoom(token.id, body);
+
+    body.ownerId = token.id;
+    return await this.roomService.createRoom(body);
   }
 }
 
