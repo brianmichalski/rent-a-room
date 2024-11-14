@@ -1,7 +1,8 @@
+import { faker } from '@faker-js/faker';
 import { User } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getToken, JWT } from 'next-auth/jwt';
-import { createMocks } from 'node-mocks-http';
+import { createMocks, RequestMethod } from 'node-mocks-http';
 import prisma from '../../prisma/client';
 import { CreateRoomInput } from '../app/dto/room/createRoom.input';
 import { UpdateRoomInput } from '../app/dto/room/updateRoom.input';
@@ -11,18 +12,20 @@ import UserRouter from '../pages/api/user/[[...params]]';
 jest.mock('next-auth/jwt');
 const mockedGetToken = getToken as jest.MockedFunction<typeof getToken>;
 
+const apiBaseUrl = '/api/room';
+
 // Shared data constants
-const validRoomData = {
+const validRoomData: UpdateRoomInput | null = {
   roomType: "S",
   bathroomType: "E",
   gender: "X",
-  description: "A cozy single room with a private bathroom",
-  rentPrice: 850.50,
-  size: 15,
-  numberOfRooms: 1,
-  street: "Maple Street",
-  number: 456,
-  other: "Near the central park",
+  description: faker.lorem.paragraph(1),
+  rentPrice: faker.number.float({ min: 200, max: 1000, fractionDigits: 1 }),
+  size: faker.number.int({ min: 10, max: 50 }),
+  numberOfRooms: faker.number.int({ min: 1, max: 10 }),
+  street: faker.location.street(),
+  number: faker.number.int({ max: 3000 }),
+  other: faker.lorem.paragraph(1),
   postalCode: "A1B2C3",
   cityId: 0,
   ownerId: 0,
@@ -32,14 +35,40 @@ const validRoomData = {
 const validOwnerData = {
   type: "B",
   phone: "+15198003254",
-  street: "King Street",
-  number: 999,
-  other: "Office",
+  street: faker.location.street(),
+  number: faker.number.int({ max: 3000 }),
+  other: faker.lorem.paragraph(1),
   postalCode: "A1B2C9",
   cityId: 0,
 };
+// const validRoomData: UpdateRoomInput | null = {
+//   roomType: "S",
+//   bathroomType: "E",
+//   gender: "X",
+//   description: "A cozy single room with a private bathroom",
+//   rentPrice: 850.50,
+//   size: 15,
+//   numberOfRooms: 1,
+//   street: "Maple Street",
+//   number: 456,
+//   other: "Near the central park",
+//   postalCode: "A1B2C3",
+//   cityId: 0,
+//   ownerId: 0,
+//   roomId: 0
+// };
 
-const newRoomDescription = "New room description";
+// const validOwnerData = {
+//   type: "B",
+//   phone: "+15198003254",
+//   street: "King Street",
+//   number: 999,
+//   other: "Office",
+//   postalCode: "A1B2C9",
+//   cityId: 0,
+// };
+
+const newRoomDescription = faker.lorem.paragraph();
 
 let actualOwnerUser: User | undefined = undefined;
 let anotherOwnerUser: User | undefined = undefined;
@@ -52,7 +81,7 @@ async function createCityAndRoomData() {
     data: { name: 'Waterloo', provinceId: province.id }
   });
 
-  validRoomData.cityId = city.id;
+  (validRoomData as UpdateRoomInput).cityId = city.id;
   validOwnerData.cityId = city.id;
 }
 
@@ -60,7 +89,7 @@ async function createUsers() {
   actualOwnerUser = await prisma.user.create({
     data: {
       firstName: 'Actual',
-      email: 'actualowner@example.com',
+      email: faker.internet.email(),
       lastName: 'Owner',
       password: 'StrongPass!1',
       isOwner: false
@@ -70,7 +99,7 @@ async function createUsers() {
   anotherOwnerUser = await prisma.user.create({
     data: {
       firstName: 'Another',
-      email: 'anotherowner@example.com',
+      email: faker.internet.email(),
       lastName: 'Owner',
       password: 'StrongPass!1',
       isOwner: true
@@ -84,13 +113,13 @@ async function mockTokenForUser(user: User | null) {
 
 beforeAll(async () => {
   await prisma.$connect();
+  await prisma.room.deleteMany();
+  await prisma.user.deleteMany();
   await createCityAndRoomData();
 });
 
 beforeEach(async () => {
   mockedGetToken.mockReset();
-  await prisma.room.deleteMany();
-  await prisma.user.deleteMany();
   await createUsers();
 });
 
@@ -129,6 +158,8 @@ describe("Room API - Room Creation Flow", () => {
   test.each(createRoomFlowCases)(
     '%s',
     async (description, useToken, roomData, expectedStatus, expectedMessage, upgradeToOwner = false) => {
+      delete (roomData as UpdateRoomInput).roomId;
+
       // Mock token based on the test case
       await mockTokenForUser((useToken ? actualOwnerUser : null) as User);
 
@@ -144,7 +175,7 @@ describe("Room API - Room Creation Flow", () => {
 
       const { req: reqCreateRoom, res: resCreateRoom } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        url: '/api/room',
+        url: apiBaseUrl,
         body: roomData as CreateRoomInput,
       });
 
@@ -161,10 +192,11 @@ describe("Room API - Room Creation Flow", () => {
   );
 });
 
-describe("Room API - Room Update Flow", () => {
+describe("Room API - Room Update and Delete Flows", () => {
   const updateRoomFlowCases = [
     [
-      "Successful update room by logging in with the property owner account",
+      "Successful UPDATE room by logging in with the property owner account",
+      'PUT',
       true, // token with user logged in
       validRoomData,
       201,
@@ -172,7 +204,8 @@ describe("Room API - Room Update Flow", () => {
       true
     ],
     [
-      "Fail to update room due to unauthorized access (without token)",
+      "Fail to UPDATE room due to unauthorized access (without token)",
+      'PUT',
       false,
       validRoomData,
       401,
@@ -180,7 +213,26 @@ describe("Room API - Room Update Flow", () => {
       true
     ],
     [
-      "Fail to update room with a different user than the room's owner",
+      "Fail to UPDATE room with a different user than the room's owner",
+      'PUT',
+      true, // token with user logged in
+      validRoomData,
+      400,
+      "Room belongs to a different user",
+      false
+    ],
+    [
+      "Successful DELETE room by logging in with the property owner account",
+      'DELETE',
+      true, // token with user logged in
+      validRoomData,
+      204,
+      'true',
+      true
+    ],
+    [
+      "Fail to DELETE room with a different user than the room's owner",
+      'DELETE',
       true, // token with user logged in
       validRoomData,
       400,
@@ -191,7 +243,7 @@ describe("Room API - Room Update Flow", () => {
 
   test.each(updateRoomFlowCases)(
     '%s',
-    async (description, useToken, roomData, expectedStatus, expectedMessage, authenticateActualOwner) => {
+    async (description, requestMethod, useToken, roomData, expectedStatus, expectedMessage, authenticateActualOwner) => {
       // Ensure that the user (actual owner) is set properly as isOwner
       await prisma.user.update({
         data: {
@@ -207,7 +259,7 @@ describe("Room API - Room Update Flow", () => {
       // Create a room first
       const { req: reqCreateRoom, res: resCreateRoom } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        url: '/api/room',
+        url: apiBaseUrl,
         body: roomData as CreateRoomInput,
       });
       await RoomRouter(reqCreateRoom, resCreateRoom);
@@ -222,17 +274,28 @@ describe("Room API - Room Update Flow", () => {
       (roomData as UpdateRoomInput).roomId = newRoom.id;
       (roomData as UpdateRoomInput).description = newRoomDescription;
 
-      // Update the room
-      const { req: reqUpdateRoom, res: resUpdateRoom } = createMocks<NextApiRequest, NextApiResponse>({
-        method: 'PUT',
-        url: '/api/room',
-        body: roomData as UpdateRoomInput,
-      });
+      // Update/delete the room
+      const method: RequestMethod = (requestMethod as RequestMethod);
+      let httpParams;
+      if (method === 'PUT') {
+        httpParams = {
+          method: method,
+          url: apiBaseUrl,
+          body: roomData as UpdateRoomInput,
+        };
+      } else if (method === 'DELETE') {
+        httpParams = {
+          method: method,
+          url: `${apiBaseUrl}/${newRoom.id}`
+        };
+      }
+      const { req: reqChangeRoom, res: resChangeRoom }
+        = createMocks<NextApiRequest, NextApiResponse>(httpParams);
 
-      await RoomRouter(reqUpdateRoom, resUpdateRoom);
+      await RoomRouter(reqChangeRoom, resChangeRoom);
 
-      expect(resUpdateRoom._getStatusCode()).toBe(expectedStatus);
-      const responseData = resUpdateRoom._getData();
+      expect(resChangeRoom._getStatusCode()).toBe(expectedStatus);
+      const responseData = resChangeRoom._getData();
       if (expectedStatus === 201) {
         expect(responseData.description).toBe(expectedMessage);
       } else {
