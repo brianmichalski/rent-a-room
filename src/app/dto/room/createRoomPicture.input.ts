@@ -15,5 +15,6 @@ export class CreateRoomPictureInput {
   @IsEmpty()
   public url!: string;
 
+  @IsOptional()
   public ownerId!: number;
 }

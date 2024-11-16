@@ -11,8 +11,9 @@ import {
 import prisma from '../../../../prisma/client';
 import { CreateRoomPictureInput } from '../../../app/dto/room/createRoomPicture.input';
 import { RoomService } from '../../../app/service/room.service';
-import { NextAuthGuard } from '../../../decorators';
+import { GetToken, NextAuthGuard } from '../../../decorators';
 import { parseFormWithFile } from '../../../utils/api';
+import { type JWT } from 'next-auth/jwt';
 
 class RooomPictureRouter {
   protected roomService: RoomService;
@@ -26,8 +27,10 @@ class RooomPictureRouter {
   @Post('/')
   @HttpCode(201)
   public async createRoomPicture(
-    @Request() req: NextApiRequest
+    @Request() req: NextApiRequest,
+    @GetToken() token: JWT
   ) {
+
     // Parse form-data (fields and files)
     const outputDir = process.env.ROOM_IMAGES_OUTPUT_DIR;
     if (!outputDir) {
@@ -45,12 +48,15 @@ class RooomPictureRouter {
     const body = plainToClass(CreateRoomPictureInput, {
       roomId: Number(fields.roomId),
       isCover: Boolean(fields.isCover),
-      order: Number(fields.order),
-      url: `${outputDir}/${uploadedFiles[0]?.newFilename}`
+      order: Number(fields.order)
     } as CreateRoomPictureInput);
 
     // Validate the DTO instance
     await validateOrReject(body);
+
+    // Fill the internal fields
+    body.url = `${outputDir}/${uploadedFiles[0]?.newFilename}`;
+    body.ownerId = token.id;
 
     return this.roomService.createRoomPicture(body);
   }
