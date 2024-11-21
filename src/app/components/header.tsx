@@ -3,6 +3,7 @@
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
+import UserMenu from './user-menu';
 
 // const Header: React.FC<AppProps> = ({ session }) => {
 const Header: React.FC = () => {
@@ -13,15 +14,7 @@ const Header: React.FC = () => {
       <div>
         {session ? (
           <div className='flex justify-between gap-2'>
-            <button
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
-            >
-              User Menu
-            </button>
-            <button onClick={() => signOut({ callbackUrl: "/" })}
-              className=" bg-black text-white py-2 px-4 rounded">
-              Sign Out
-            </button>
+            <UserMenu />
           </div>
         ) : (
           <div className='flex justify-between gap-2'>
