@@ -1,9 +1,10 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getCsrfToken, getSession, signIn } from "next-auth/react";
-import Image from 'next/image';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import HomeLink from "../../app/components/home-link";
+import AuthPage from "../../app/components/auth-page";
 
 export default function SignIn({
   csrfToken,
@@ -60,90 +61,75 @@ export default function SignIn({
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Image
-            className="mx-auto"
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-            width={40}
-            height={40}
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
+    <AuthPage title="Sign in to your account">
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="on">
+          <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="on">
-            <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
+          {/* Email field */}
+          <div>
+            <label htmlFor="email" className="block text-gray-700">
+              Email address
+            </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"  // Suggest saved emails
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
 
-            {/* Email field */}
-            <div>
-              <label htmlFor="email" className="block text-gray-700">
-                Email address
+          {/* Password field */}
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-gray-700">
+                Password
               </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"  // Suggest saved emails
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+              <div className="text-sm">
+                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                  Forgot password?
+                </a>
               </div>
             </div>
-
-            {/* Password field */}
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-gray-700">
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"  // Suggest saved password
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"  // Suggest saved password
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
             </div>
+          </div>
 
-            {/* Error display */}
-            <div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              <button
-                type="submit"
-                className='w-full py-3 mt-6 text-white font-semibold rounded-md  bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'>
-                Sign in
-              </button>
-            </div>
-          </form>
+          {/* Error display */}
+          <div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <button
+              type="submit"
+              className='w-full py-3 mt-6 text-white font-semibold rounded-md  bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'>
+              Sign in
+            </button>
+          </div>
+        </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?
-            <Link href="/auth/register" className="ml-0.5 font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-              Register a new account.
-            </Link>
-          </p>
-        </div>
+        <p className="mt-10 text-center text-sm text-gray-500">
+          Not a member?
+          <Link href="/auth/register" className="ml-0.5 font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            Register a new account.
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthPage>
   );
 }
 

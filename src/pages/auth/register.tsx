@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import AuthPage from '../../app/components/auth-page';
 
 interface RegisterFormData {
   firstName: string;
@@ -100,80 +101,75 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-        <h2 className="mb-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Create an Account
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* General Error Message */}
-          {errors.general && <p className="text-red-500 text-sm mb-4">{errors.general}</p>}
+    <AuthPage title="Create an Account">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* General Error Message */}
+        {errors.general && <p className="text-red-500 text-sm mb-4">{errors.general}</p>}
 
-          <div>
-            <label htmlFor="firstName" className="block text-gray-700">First Name</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
-          </div>
+        <div>
+          <label htmlFor="firstName" className="block text-gray-700">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+        </div>
 
-          <div>
-            <label htmlFor="lastName" className="block text-gray-700">Last Name</label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-          </div>
+        <div>
+          <label htmlFor="lastName" className="block text-gray-700">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+        </div>
 
-          <div>
-            <label htmlFor="email" className="block text-gray-700">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-          </div>
+        <div>
+          <label htmlFor="email" className="block text-gray-700">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
 
-          <div>
-            <label htmlFor="password" className="block text-gray-700">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-          </div>
+        <div>
+          <label htmlFor="password" className="block text-gray-700">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 mt-6 text-white font-semibold rounded-md ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'}`}
-          >
-            {loading ? 'Registering...' : 'Create Account'}
-          </button>
-        </form>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 mt-6 text-white font-semibold rounded-md ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'}`}
+        >
+          {loading ? 'Registering...' : 'Create Account'}
+        </button>
+      </form>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
-          Already have an account?{' '}
-          <Link href="/auth/signin" className="ml-0.5 font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-            Sign In
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="mt-10 text-center text-sm text-gray-500">
+        Already have an account?{' '}
+        <Link href="/auth/signin" className="ml-0.5 font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+          Sign In
+        </Link>
+      </p>
+    </AuthPage>
   );
 };
 
