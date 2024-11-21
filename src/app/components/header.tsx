@@ -1,22 +1,28 @@
 // components/Header.tsx
 "use client";
+import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 
+// const Header: React.FC<AppProps> = ({ session }) => {
 const Header: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
+  const { data: session } = useSession();
   return (
     <nav className="sticky top-0 flex justify-between items-center px-20 py-4 bg-gray-100">
       <div className="text-xl font-bold">RentARoom</div>
       <div>
-        {isLoggedIn ? (
-          <button
-            onClick={() => setIsLoggedIn(false)}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
-          >
-            User Menu
-          </button>
+        {session ? (
+          <div className='flex justify-between gap-2'>
+            <button
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
+            >
+              User Menu
+            </button>
+            <button onClick={() => signOut({ callbackUrl: "/" })}
+              className=" bg-black text-white py-2 px-4 rounded">
+              Sign Out
+            </button>
+          </div>
         ) : (
           <div className='flex justify-between gap-2'>
             <Link
@@ -27,10 +33,10 @@ const Header: React.FC = () => {
             </Link>
 
             <Link
-              href="/auth/signin"
-              className=" hover:bg-black hover:text-white py-2 px-4 rounded"
+              href="/auth/register"
+              className="hover:text-blue-600 hover:underline py-2 px-4 rounded"
             >
-              Subscribe
+              Register
             </Link>
           </div>
         )}

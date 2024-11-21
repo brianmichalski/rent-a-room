@@ -5,8 +5,12 @@ import {
   MapPinIcon
 } from "@heroicons/react/24/outline";
 import React from 'react';
+interface FilterAndSortProps {
+  onFilter: (value: string) => void;
+  onSort: (value: string) => void;
+}
 
-const FilterAndSort: React.FC = () => {
+const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort }) => {
   return (
     <div className="flex justify-between items-center gap-4 px-20 py-4 bg-white border-b border-gray-300">
       <div className="flex space-x-2">

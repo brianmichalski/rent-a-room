@@ -1,25 +1,19 @@
 // components/Layout.tsx
-import React, { ReactNode } from 'react';
+"use client";
+import { SessionProvider } from 'next-auth/react';
+import React from 'react';
 import '../styles/globals.css'; // Adjust path if necessary
-import Header from './components/header';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="min-h-screen flex flex-col">
-          <Header />
-          <main>
-            {children}
-          </main>
+          <SessionProvider>{children}</SessionProvider>
         </div>
       </body>
     </html>
   );
 };
 
-export default Layout;
+export default RootLayout;

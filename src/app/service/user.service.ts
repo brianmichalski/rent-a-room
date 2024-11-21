@@ -1,9 +1,10 @@
 import { User } from "@prisma/client";
 import { compare, hash } from "bcrypt";
 import { differenceInMinutes } from "date-fns";
-import { UnauthorizedException } from "next-api-decorators";
+import { BadRequestException, UnauthorizedException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { CreateUserInput, UpdatePropertyOwnerInput } from "../dto";
+import { da } from "@faker-js/faker/.";
 
 export class UserService {
   private prisma;
@@ -60,6 +61,10 @@ export class UserService {
   }
 
   public async createUser(data: CreateUserInput): Promise<User> {
+    if (await prisma.user.findUnique({ where: { email: data.email } })) {
+      throw new BadRequestException('This email address is already registered');
+    }
+
     const newUser = await prisma.user.create({
       data: {
         firstName: data.firstName,
