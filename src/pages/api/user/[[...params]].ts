@@ -1,6 +1,7 @@
 import { User } from '@prisma/client';
 import {
   Body,
+  Get,
   HttpCode,
   Post,
   Put,
@@ -8,10 +9,10 @@ import {
   createHandler
 } from 'next-api-decorators';
 import { type JWT } from 'next-auth/jwt';
-import { GetToken, NextAuthGuard } from '../../../decorators';
+import prisma from '../../../../prisma/client';
 import { CreateUserInput, UpdatePropertyOwnerInput } from '../../../app/dto';
 import { UserService } from '../../../app/service/user.service';
-import prisma from '../../../../prisma/client';
+import { GetToken, NextAuthGuard } from '../../../decorators';
 
 
 class UserRouter {
@@ -21,14 +22,24 @@ class UserRouter {
     this.userService = new UserService(prisma);
   }
 
-  // POST /api/users (create one)
+  // POST /api/user (create one)
   @Post()
   @HttpCode(201)
   public async createUser(@Body(ValidationPipe) body: CreateUserInput): Promise<User> {
     return await this.userService.createUser(body);
   }
 
-  // PUT /api/users/property-owner (update account)
+  // GET /api/user (get account data)
+  @NextAuthGuard()
+  @Get('/property-owner')
+  @HttpCode(201)
+  public async getUserData(
+    @GetToken() token: JWT
+  ): Promise<User | undefined> {
+    return await this.userService.getById(token.id);
+  }
+
+  // PUT /api/user/property-owner (update account)
   @NextAuthGuard()
   @Put('/property-owner')
   @HttpCode(201)

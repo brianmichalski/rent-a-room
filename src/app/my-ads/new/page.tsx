@@ -113,7 +113,7 @@ const CreateRoomPage = () => {
       console.log('Raw response:', responseText);
 
       if (response.ok) {
-        router.push('/rooms'); // Redirect after room creation
+        router.push('/my-ads'); // Redirect after room creation
       } else {
         const errorData = JSON.parse(responseText);
         const { message, errors } = errorData;

@@ -4,7 +4,6 @@ import { differenceInMinutes } from "date-fns";
 import { BadRequestException, UnauthorizedException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { CreateUserInput, UpdatePropertyOwnerInput } from "../dto";
-import { da } from "@faker-js/faker/.";
 
 export class UserService {
   private prisma;
@@ -58,6 +57,23 @@ export class UserService {
 
     await this.updateLoginAttempData(user, 0);
     return user;
+  }
+
+  public async getById(id: number): Promise<User> {
+    return await this.prisma.user.findUnique({
+      include: {
+        address: {
+          include: {
+            city: {
+              include: {
+                province: true
+              }
+            }
+          }
+        }
+      },
+      where: { id: id }
+    }) as User;
   }
 
   public async createUser(data: CreateUserInput): Promise<User> {
