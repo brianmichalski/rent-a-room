@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const UserMenu: React.FC = () => {
   const products = [
-    { name: 'My Ads', description: 'Manage your ads', href: '#', icon: HomeModernIcon },
+    { name: 'My Ads', description: 'Manage your ads', href: '/my-ads', icon: HomeModernIcon },
     { name: 'Chats', description: 'Speak directly to your customers', href: '#', icon: ChatBubbleLeftRightIcon },
     { name: 'Favorites', description: 'Handle your favorite ads', href: '#', icon: StarIcon },
     { name: 'My Account', description: 'Manage your data, password and more', href: '#', icon: UserCircleIcon },
@@ -19,8 +19,8 @@ const UserMenu: React.FC = () => {
     <PopoverGroup className="hidden lg:flex lg:gap-x-12">
       <Popover className="relative">
         <PopoverButton className="flex items-center gap-x-1 py-2 px-4 rounded font-semibold text-gray-900">
-          <UserCircleIcon className="size-5 flex-none text-gray-600" />{' '} {session?.user?.name?.split(' ')[0]}
-          <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
+          <UserCircleIcon className="size-5 flex-none" />{' '} {session?.user?.name?.split(' ')[0]}
+          <ChevronDownIcon aria-hidden="true" className="size-5 flex-none"/>
         </PopoverButton>
 
         <PopoverPanel

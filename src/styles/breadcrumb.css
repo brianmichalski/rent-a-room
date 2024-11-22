@@ -1,0 +1,44 @@
+.ht-breadcrumbs {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.ht-breadcrumbs li {
+  display: inline-flex;
+  list-style: none;
+  align-items: center;
+}
+
+.ht-breadcrumbs > li > a {
+  color: var(--gray-400);
+  font-size: var(--text-base);
+  display: inline-flex;
+  align-items: center;
+}
+
+.ht-breadcrumbs > li > a svg {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.ht-breadcrumbs > li:after {
+  content: '\203A'; /* or use `content: "/";` if you prefer */
+  padding: 0 16px;
+  color: var(--gray-400);
+}
+
+.ht-breadcrumbs > li:last-of-type a {
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.ht-breadcrumbs > li:last-of-type a:hover {
+  text-decoration: none;
+}
+
+.ht-breadcrumbs > li:last-of-type:after {
+  content: none;
+}

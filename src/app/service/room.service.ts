@@ -12,6 +12,31 @@ export class RoomService {
     this.prisma = _prisma;
   }
 
+  public async getAll(ownerId: number) {
+    return await this.prisma.room.findMany({
+      include: {
+        owner: true
+      },
+      where: {
+        owner: {
+          id: ownerId
+        }
+      },
+    });
+  }
+
+  public async getCoverPictureUrl(roomId: number) {
+    const result = await this.prisma.roomPicture.findFirst(
+      {
+        where: {
+          roomId: roomId,
+          isCover: true
+        }
+      }
+    );
+    return result?.url;
+  }
+
   public async createRoom(data: CreateRoomInput): Promise<Room> {
 
     await this.checkOwnerPreconditions(data.ownerId);

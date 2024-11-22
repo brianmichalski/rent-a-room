@@ -25,7 +25,7 @@ interface SearchResultProps {
 
 const SearchResult: React.FC<SearchResultProps> = ({ results }) => {
   return (
-    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-6 py-6 px-20">
+    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-6 py-6">
       {rooms.map((room, index) => (
         <RoomCard key={index} room={room} />
       ))}

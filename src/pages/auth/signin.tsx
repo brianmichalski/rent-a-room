@@ -116,7 +116,7 @@ export default function SignIn({
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
-              className='w-full py-3 mt-6 text-white font-semibold rounded-md  bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'>
+              className='w-full py-3 mt-6 text-white font-semibold rounded-md bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'>
               Sign in
             </button>
           </div>

@@ -1,7 +1,8 @@
-import { Room } from '@prisma/client';
+import { Room, RoomPicture } from '@prisma/client';
 import {
   Body,
   Delete,
+  Get,
   HttpCode,
   Param,
   Post,
@@ -21,6 +22,22 @@ class RoomRouter {
 
   constructor() {
     this.roomService = new RoomService(prisma);
+  }
+
+  // GET /api/room (get all)
+  @NextAuthGuard()
+  @Get('/my-rooms')
+  @HttpCode(201)
+  public async getAllRooms(@GetToken() token: JWT): Promise<Room[]> {
+    return await this.roomService.getAll(token.id);
+  }
+
+  // GET /api/room/:id/cover (get room cover picture)
+  @NextAuthGuard()
+  @Get('/:id/cover')
+  @HttpCode(201)
+  public async getCoverPicture(@Param("id") roomId: number): Promise<string | undefined> {
+    return await this.roomService.getCoverPictureUrl(Number(roomId));
   }
 
   // POST /api/room (create one)

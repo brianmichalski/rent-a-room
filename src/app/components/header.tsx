@@ -1,16 +1,20 @@
 // components/Header.tsx
 "use client";
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
+import HomeLink from './home-link';
 import UserMenu from './user-menu';
 
 // const Header: React.FC<AppProps> = ({ session }) => {
 const Header: React.FC = () => {
   const { data: session } = useSession();
   return (
-    <nav className="sticky top-0 flex justify-between items-center px-20 py-4 bg-gray-100">
-      <div className="text-xl font-bold">RentARoom</div>
+    <nav className="sticky top-0 flex justify-between items-center px-20 py-4 bg-custom-blue">
+      <div className="flex items-center gap-x-2 text-xl font-bold">
+        <HomeLink />
+        RentARoom
+      </div>
       <div>
         {session ? (
           <div className='flex justify-between gap-2'>

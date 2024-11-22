@@ -12,7 +12,7 @@ interface FilterAndSortProps {
 
 const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort }) => {
   return (
-    <div className="flex justify-between items-center gap-4 px-20 py-4 bg-white border-b border-gray-300">
+    <div className="flex justify-between items-center gap-4 py-4 bg-white border-b border-gray-300">
       <div className="flex space-x-2">
         <div className="flex items-center">
           <div className="flex items-center space-x-2">
