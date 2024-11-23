@@ -22,6 +22,7 @@ jest.mock("../../../../prisma/client", () => ({
   user: {
     create: jest.fn(),
     update: jest.fn(),
+    findUnique: jest.fn(),
   }
 }));
 
@@ -55,6 +56,7 @@ describe("UserService", () => {
       } as User;
 
       (prisma.user.create as jest.Mock).mockResolvedValue(expectedUser);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await userService.createUser(createUserData);
       expect(result).toEqual(expectedUser);

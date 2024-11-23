@@ -56,7 +56,7 @@ describe('AddressInput Validation', () => {
     addressInput.postalCode = 'A1B2C3D'; // Exceeds 6 characters
     const errors = await validate(addressInput);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].constraints?.maxLength).toBeDefined();
+    expect(errors[0].constraints?.isLength).toBeDefined();
   });
 
   it('should fail if cityId is empty', async () => {

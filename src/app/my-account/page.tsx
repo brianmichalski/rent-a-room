@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { AddressType } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { extractValidationErrors } from '../../utils/form';
 
 interface FormData {
   firstName: string;
@@ -14,6 +15,17 @@ interface FormData {
   cityId: number;
   provinceId: number;
   type: AddressType;
+}
+interface FormErrors {
+  phone?: string;
+  street?: string;
+  number?: number;
+  other?: string;
+  postalCode?: string;
+  cityId?: number;
+  provinceId?: number;
+  type?: AddressType;
+  general?: string;
 }
 
 interface Province {
@@ -42,7 +54,9 @@ const UpdateAccountForm = () => {
 
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [cities, setCities] = useState<City[]>([]);
+  const [validationErrors, setValidationErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [formState, setFormState] = useState<'initial' | 'updated' | 'error'>('initial');
 
   // Fetch user data and provinces on mount
   useEffect(() => {
@@ -59,8 +73,6 @@ const UpdateAccountForm = () => {
 
         const userData = await userResponse.json();
         const provinceData = await provinceResponse.json();
-
-        console.log(provinceData)
 
         setProvinces(provinceData);
 
@@ -119,6 +131,8 @@ const UpdateAccountForm = () => {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
+      setValidationErrors({});
       const response = await fetch('/api/user/property-owner', {
         method: 'PUT',
         headers: {
@@ -127,14 +141,21 @@ const UpdateAccountForm = () => {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update user data');
+      const responseText = await response.text();
+      if (response.ok) {
+        setFormState('updated');
+      } else {
+        const errors = extractValidationErrors<FormErrors, FormData>(
+          responseText, formData, validationErrors
+        );
+        setFormState('error');
+        setValidationErrors(errors);
       }
-
-      alert('Account updated successfully!');
     } catch (error) {
       console.error('Error updating data:', error);
       alert('Failed to update account.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,7 +166,16 @@ const UpdateAccountForm = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-6 rounded-md shadow-md space-y-4">
       <h2 className="text-xl font-semibold text-gray-700">Update Account</h2>
-
+      {formState === 'updated' ?
+        <div className='text-center mt-8 p-2 bg-green-100 text-green-500 rounded-md'>
+          Account updated successfully!
+        </div>
+        : ''}
+      {formState === 'error' ?
+        <div className='text-center mt-8 p-2 bg-red-100 text-red-500 rounded-md'>
+          Verify the errors and try again
+        </div>
+        : ''}
       <div>
         <label className="block text-sm font-medium text-gray-600">First Name:</label>
         <input
@@ -153,7 +183,8 @@ const UpdateAccountForm = () => {
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded-md"
+          disabled={true}
+          className="w-full mt-1 p-2 rounded-md bg-gray-100 border-gray-200"
         />
       </div>
 
@@ -164,7 +195,8 @@ const UpdateAccountForm = () => {
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded-md"
+          disabled={true}
+          className="w-full mt-1 p-2 border rounded-md bg-gray-100 border-gray-200"
         />
       </div>
 
@@ -177,6 +209,7 @@ const UpdateAccountForm = () => {
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-md"
         />
+        {validationErrors.phone && <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>}
       </div>
 
       <div>
@@ -188,6 +221,7 @@ const UpdateAccountForm = () => {
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-md"
         />
+        {validationErrors.street && <p className="text-red-500 text-sm mt-1">{validationErrors.street}</p>}
       </div>
 
       <div>
@@ -199,6 +233,7 @@ const UpdateAccountForm = () => {
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-md"
         />
+        {validationErrors.number && <p className="text-red-500 text-sm mt-1">{validationErrors.number}</p>}
       </div>
 
       <div>
@@ -210,6 +245,7 @@ const UpdateAccountForm = () => {
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-md"
         />
+        {validationErrors.other && <p className="text-red-500 text-sm mt-1">{validationErrors.other}</p>}
       </div>
 
       <div>
@@ -221,6 +257,7 @@ const UpdateAccountForm = () => {
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-md"
         />
+        {validationErrors.postalCode && <p className="text-red-500 text-sm mt-1">{validationErrors.postalCode}</p>}
       </div>
 
       <div>
@@ -238,6 +275,7 @@ const UpdateAccountForm = () => {
             </option>
           ))}
         </select>
+        {validationErrors.provinceId && <p className="text-red-500 text-sm mt-1">Required field</p>}
       </div>
 
       <div>
@@ -256,6 +294,7 @@ const UpdateAccountForm = () => {
             </option>
           ))}
         </select>
+        {validationErrors.cityId && <p className="text-red-500 text-sm mt-1">Required field</p>}
       </div>
 
       <div>
@@ -269,6 +308,7 @@ const UpdateAccountForm = () => {
           <option value={AddressType.R}>Residential</option>
           <option value={AddressType.B}>Business</option>
         </select>
+        {validationErrors.type && <p className="text-red-500 text-sm mt-1">{validationErrors.type}</p>}
       </div>
 
       <button

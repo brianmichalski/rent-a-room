@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import AuthPage from '../../app/components/auth-page';
+import { extractValidationErrors } from '../../utils/form';
 
 interface RegisterFormData {
   firstName: string;
@@ -27,7 +28,7 @@ const RegisterPage = () => {
     password: '',
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [validationErrors, setValidationErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -35,32 +36,10 @@ const RegisterPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.firstName || formData.firstName.length < 2 || formData.firstName.length > 100) {
-      newErrors.firstName = 'First name must be between 2 and 100 characters';
-    }
-    if (!formData.lastName || formData.lastName.length < 2 || formData.lastName.length > 100) {
-      newErrors.lastName = 'Last name must be between 2 and 100 characters';
-    }
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    if (!formData.password || formData.password.length < 8 || !/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) || !/[0-9]/.test(formData.password) || !/[!@#$%^&*()_+]/.test(formData.password)) {
-      newErrors.password = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
     setLoading(true);
+    setValidationErrors({});
     try {
       const response = await fetch('/api/user', {
         method: 'POST',
@@ -70,31 +49,18 @@ const RegisterPage = () => {
         body: JSON.stringify(formData),
       });
 
-      const responseText = await response.text(); // Read the response as text first
-      console.log('Raw response:', responseText);
-
+      const responseText = await response.text();
       if (response.ok) {
         router.push('/auth/signin');
       } else {
-        const errorData = JSON.parse(responseText); // Try parsing the raw response as JSON
-        const { message, errors } = errorData;
-
-        // Display server errors
-        let serverErrors: FormErrors = { general: message };
-
-        // Map server validation errors to form errors
-        if (errors) {
-          serverErrors = {
-            ...serverErrors,
-            ...errors,
-          };
-        }
-
-        setErrors(serverErrors);
+        const errors = extractValidationErrors<FormErrors, RegisterFormData>(
+          responseText, formData, validationErrors
+        );
+        setValidationErrors(errors);
       }
     } catch (error) {
       console.error('Error during registration:', error);
-      setErrors({ general: 'An error occurred. Please try again.' });
+      setValidationErrors({ general: 'An error occurred. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -104,7 +70,7 @@ const RegisterPage = () => {
     <AuthPage title="Create an Account">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* General Error Message */}
-        {errors.general && <p className="text-red-500 text-sm mb-4">{errors.general}</p>}
+        {validationErrors.general && <p className="text-red-500 text-sm mb-4">{validationErrors.general}</p>}
 
         <div>
           <label htmlFor="firstName" className="block text-gray-700">First Name</label>
@@ -115,7 +81,7 @@ const RegisterPage = () => {
             value={formData.firstName}
             onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
-          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+          {validationErrors.firstName && <p className="text-red-500 text-sm mt-1">{validationErrors.firstName}</p>}
         </div>
 
         <div>
@@ -127,7 +93,7 @@ const RegisterPage = () => {
             value={formData.lastName}
             onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
-          {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+          {validationErrors.lastName && <p className="text-red-500 text-sm mt-1">{validationErrors.lastName}</p>}
         </div>
 
         <div>
@@ -139,7 +105,7 @@ const RegisterPage = () => {
             value={formData.email}
             onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {validationErrors.email && <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>}
         </div>
 
         <div>
@@ -151,7 +117,7 @@ const RegisterPage = () => {
             value={formData.password}
             onChange={handleChange} className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
-          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          {validationErrors.password && <p className="text-red-500 text-sm mt-1">{validationErrors.password}</p>}
         </div>
 
         <button

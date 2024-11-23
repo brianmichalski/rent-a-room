@@ -1,6 +1,7 @@
 import {
   IsNotEmpty,
   IsOptional,
+  Length,
   Matches,
   MaxLength
 } from 'class-validator';
@@ -18,8 +19,8 @@ export class AddressInput {
   public other?: string;
 
   @IsNotEmpty()
-  @MaxLength(6)
-  @Matches(/([a-z]\d){3}/i)
+  @Matches(/([a-z]\d){3}/i, { message: 'postalCode is not valid' })
+  @Length(6, 6, { message: 'postalCode must have exactly 6 characteres' })
   public postalCode!: string;
 
   @IsNotEmpty()
