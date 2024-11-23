@@ -5,18 +5,19 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Max,
   Min
 } from 'class-validator';
 import { AddressInput } from '../address.input';
 
 export class CreateRoomInput extends AddressInput {
-  @IsEnum(RoomType)
+  @IsEnum(RoomType, { message: 'Select a valid option for Room Type' })
   public roomType!: RoomType;
 
-  @IsEnum(BathroomType)
+  @IsEnum(BathroomType, { message: 'Select a valid option for Bathroom' })
   public bathroomType!: BathroomType;
 
-  @IsEnum(Gender)
+  @IsEnum(Gender, { message: 'Select a valid option for Gender' })
   public gender!: Gender;
 
   @IsString()
@@ -24,11 +25,12 @@ export class CreateRoomInput extends AddressInput {
   public description!: string;
 
   @IsNumber()
-  @Min(1)
+  @Min(100)
   public rentPrice!: number;
 
   @IsInt()
-  @Min(1)
+  @Min(10)
+  @Max(51)
   public size!: number;
 
   @IsInt()

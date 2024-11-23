@@ -1,14 +1,21 @@
-export function extractValidationErrors<FormErrors, FormData>(httpResponse: string,
-  formData: FormData, validationErrors: FormErrors) {
-
+export function extractValidationErrors<FormErrors, FormData>(
+  httpResponse: string,
+  formData: FormData,
+  validationErrors: FormErrors
+): FormErrors {
   const { errors } = JSON.parse(httpResponse);
+
+  // Create a new object to hold validation errors
+  const newValidationErrors: FormErrors = {} as FormErrors;
+
   for (const key in formData) {
     const fieldError = errors.find((er: string) => er.startsWith(key));
     if (fieldError) {
-      validationErrors[key as unknown as keyof FormErrors] = fieldError.replace(key, camelCaseToSpaces(key));
+      newValidationErrors[key as unknown as keyof FormErrors] = fieldError.replace(key, camelCaseToSpaces(key));
     }
   }
-  return validationErrors;
+
+  return newValidationErrors;
 }
 
 function camelCaseToSpaces(input: string) {

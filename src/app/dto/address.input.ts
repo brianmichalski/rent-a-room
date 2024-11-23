@@ -1,9 +1,12 @@
 import {
+  IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   Length,
   Matches,
-  MaxLength
+  MaxLength,
+  Min
 } from 'class-validator';
 
 export class AddressInput {
@@ -11,7 +14,8 @@ export class AddressInput {
   @MaxLength(100)
   public street!: string;
 
-  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
   public number!: number;
 
   @IsOptional()
@@ -20,9 +24,10 @@ export class AddressInput {
 
   @IsNotEmpty()
   @Matches(/([a-z]\d){3}/i, { message: 'postalCode is not valid' })
-  @Length(6, 6, { message: 'postalCode must have exactly 6 characteres' })
+  @Length(6, 6, { message: 'postalCode must have exactly 6 characters' })
   public postalCode!: string;
 
-  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
   public cityId!: number;
 }

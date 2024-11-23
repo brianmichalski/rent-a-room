@@ -122,17 +122,16 @@ const UpdateAccountForm = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'number' || name === 'cityId' || name === 'provinceId' ? parseInt(value) : value,
+      [name]: value && (name === 'number' || name === 'cityId' || name === 'provinceId') ? parseInt(value) : value,
     });
   };
 
   // Submit the form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true);
+    setFormState('initial');
     try {
-      setIsLoading(true);
-      setValidationErrors({});
       const response = await fetch('/api/user/property-owner', {
         method: 'PUT',
         headers: {
@@ -143,13 +142,16 @@ const UpdateAccountForm = () => {
 
       const responseText = await response.text();
       if (response.ok) {
+        setValidationErrors({});
         setFormState('updated');
       } else {
         const errors = extractValidationErrors<FormErrors, FormData>(
-          responseText, formData, validationErrors
+          responseText,
+          formData,
+          validationErrors
         );
         setFormState('error');
-        setValidationErrors(errors);
+        setValidationErrors(errors); // Update validation errors in state
       }
     } catch (error) {
       console.error('Error updating data:', error);
@@ -275,7 +277,6 @@ const UpdateAccountForm = () => {
             </option>
           ))}
         </select>
-        {validationErrors.provinceId && <p className="text-red-500 text-sm mt-1">Required field</p>}
       </div>
 
       <div>
