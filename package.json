@@ -9,6 +9,7 @@
     "lint": "next lint",
     "test": "jest --runInBand",
     "coverage": "jest --runInBand --coverage",
+    "setup:db": "npx prisma db push && ts-node prisma/seed.ts",
     "test:db": "dotenv -e .env.test -- npx prisma db push"
   },
   "dependencies": {
