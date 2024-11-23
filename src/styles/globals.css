@@ -2,3 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind forms;
+
+.crud-action {
+  @apply hover:bg-gray-100 p-2 rounded-md;
+}

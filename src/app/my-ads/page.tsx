@@ -1,8 +1,8 @@
-'use client'; // Ensure the component is client-side for API requests
+'use client';
 
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { BathroomType, Gender, RoomType } from '@prisma/client'; // Import enums from Prisma
-import Image from 'next/image'; // To load images in Next.js
+import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BathroomType, Gender, RoomType } from '@prisma/client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../components/breadcrumb';
@@ -28,44 +28,68 @@ const MyAds = () => {
   const [rooms, setRooms] = useState<RoomWithCover[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Fetch room data
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+      const roomsResponse = await fetch('/api/room/my-rooms');
+      const roomsData: Room[] = await roomsResponse.json();
+
+      const roomsWithCover = await Promise.all(
+        roomsData.map(async (room) => {
+          const coverResponse = await fetch(`/api/room/${room.id}/cover`);
+          const coverImageUrl = await coverResponse.text();
+          return { ...room, coverImageUrl };
+        })
+      );
+
+      setRooms(roomsWithCover);
+    } catch (error) {
+      console.error('Error fetching rooms data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        // Fetch all rooms from the API
-        const roomsResponse = await fetch('/api/room/my-rooms');
-        const roomsData: Room[] = await roomsResponse.json();
-
-        // Fetch cover image for each room
-        const roomsWithCover = await Promise.all(
-          roomsData.map(async (room) => {
-            const coverResponse = await fetch(`/api/room/${room.id}/cover`);
-            const coverImageUrl = await coverResponse.text(); // Assuming the cover image URL is returned as a text
-
-            return { ...room, coverImageUrl };
-          })
-        );
-
-        setRooms(roomsWithCover);
-      } catch (error) {
-        console.error('Error fetching rooms data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRooms();
   }, []);
+
+  // Remove room function
+  const removeRoom = async (id: number) => {
+    const confirmDelete = confirm('Are you sure you want to delete this ad?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/room/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete the room.');
+      }
+
+      // Reload the rooms
+      await fetchRooms();
+    } catch (error) {
+      console.error('Error deleting room:', error);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-ads', label: 'My Ads' }]} />
       <h1 className="text-3xl font-semibold mb-6">My Ads</h1>
-      {loading ? <div>Loading...</div> :
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
         <>
-          <div className='w-full flex mb-6'>
-            <Link href={'my-ads/new'}
-              title='Add new room'
-              className='p-3 text-white font-semibold rounded-md bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'>
+          <div className="w-full flex mb-6">
+            <Link
+              href={'my-ads/new'}
+              title="Add new room"
+              className="p-3 text-white font-semibold rounded-md bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+            >
               <PlusCircleIcon width={24} />
             </Link>
           </div>
@@ -81,6 +105,7 @@ const MyAds = () => {
                   <th className="px-4 py-2">Size (m²)</th>
                   <th className="px-4 py-2">Number of Rooms</th>
                   <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -102,16 +127,27 @@ const MyAds = () => {
                     <td className="px-4 py-2">{room.size}</td>
                     <td className="px-4 py-2">{room.numberOfRooms}</td>
                     <td className="px-4 py-2">
-                      <span className={`px-2 py-1 text-sm font-semibold rounded-lg ${room.isRented ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                      <span
+                        className={`px-2 py-1 text-sm font-semibold rounded-lg ${room.isRented ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+                          }`}
+                      >
                         {room.isRented ? 'Rented' : 'Available'}
                       </span>
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className='flex'>
+                        <button onClick={() => removeRoom(room.id)} title="Remove Ad" className='crud-action'>
+                          <TrashIcon width={24} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>}
+        </>
+      )}
     </div>
   );
 };

@@ -168,6 +168,8 @@ const CreateRoomPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-ads', label: 'My Ads' }, { href: '/my-ads/new', label: 'New' }]} />
+
+      <h1 className="text-3xl font-semibold mb-6">New Ad</h1>
       {/* Tabs Section */}
 
       <div className='block '>
