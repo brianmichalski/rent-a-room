@@ -63,6 +63,6 @@ describe('AddressInput Validation', () => {
     addressInput.cityId = undefined as unknown as number;
     const errors = await validate(addressInput);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].constraints?.isNotEmpty).toBeDefined();
+    expect(errors[0].constraints?.min).toBeDefined();
   });
 });
