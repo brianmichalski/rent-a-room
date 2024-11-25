@@ -1,12 +1,12 @@
 import { BathroomType, Gender, RoomType } from '@prisma/client';
 import { validate } from 'class-validator'; // Adjust path if necessary
-import { CreateRoomInput } from '../createRoom.input';
+import { RoomInput } from '../room.input';
 
 describe('CreateRoomInput Class Fields Validation', () => {
-  let createRoomInput: CreateRoomInput;
+  let createRoomInput: RoomInput;
 
   beforeEach(() => {
-    createRoomInput = new CreateRoomInput();
+    createRoomInput = new RoomInput();
     createRoomInput.roomType = RoomType.S;
     createRoomInput.bathroomType = BathroomType.E;
     createRoomInput.gender = Gender.F;

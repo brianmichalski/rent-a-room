@@ -1,9 +1,8 @@
 import { AddressType, Room, RoomPicture } from "@prisma/client";
 import { BadRequestException, NotFoundException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
-import { CreateRoomInput } from "../dto/room/createRoom.input";
-import { CreateRoomPictureInput } from "../dto/room/createRoomPicture.input";
-import { UpdateRoomInput } from "../dto/room/updateRoom.input";
+import { RoomInput } from "../dto/room/room.input";
+import { RoomPictureInput } from "../dto/room/roomPicture.input";
 
 export class RoomService {
   private prisma;
@@ -12,10 +11,19 @@ export class RoomService {
     this.prisma = _prisma;
   }
 
-  public async getAll(ownerId: number) {
+  public async getAllByOwnerId(ownerId: number) {
     return await this.prisma.room.findMany({
       include: {
-        owner: true
+        owner: true,
+        address: {
+          include: {
+            city: {
+              include: {
+                province: true
+              }
+            }
+          }
+        }
       },
       where: {
         owner: {
@@ -23,6 +31,28 @@ export class RoomService {
         }
       },
     });
+  }
+
+  public async getById(id: number): Promise<Room> {
+    const result = await this.prisma.room.findUnique({
+      include: {
+        owner: true,
+        address: {
+          include: {
+            city: {
+              include: {
+                province: true
+              }
+            }
+          }
+        }
+      },
+      where: {
+        id: id
+      },
+    });
+
+    return result as Room;
   }
 
   public async getCoverPictureUrl(roomId: number) {
@@ -37,27 +67,27 @@ export class RoomService {
     return result?.url;
   }
 
-  public async createRoom(data: CreateRoomInput): Promise<Room> {
+  public async createRoom(data: RoomInput): Promise<Room> {
 
     await this.checkOwnerPreconditions(data.ownerId);
 
     // TODO: check address duplicity
     const newRoom = await this.prisma.room.create({
-      data: this.parseInput(data)
+      data: this.parseInputRoomCreate(data)
     });
     return newRoom;
   }
 
-  public async updateRoom(data: UpdateRoomInput): Promise<Room> {
+  public async updateRoom(id: number, data: RoomInput): Promise<Room> {
 
-    await this.checkOwnerPreconditions(data.ownerId, data.roomId);
+    await this.checkOwnerPreconditions(data.ownerId, id);
 
     // TODO: check address duplicity
     const updatedRoom = await this.prisma.room.update({
       where: {
-        id: data.roomId
+        id: id
       },
-      data: this.parseInput(data)
+      data: this.parseInputRoomUpdate(data)
     });
     return updatedRoom;
   }
@@ -70,7 +100,7 @@ export class RoomService {
     return (result != null);
   }
 
-  public async createRoomPicture(data: CreateRoomPictureInput): Promise<RoomPicture> {
+  public async createRoomPicture(data: RoomPictureInput): Promise<RoomPicture> {
 
     await this.checkOwnerPreconditions(data.ownerId, data.roomId);
 
@@ -148,7 +178,7 @@ export class RoomService {
     }
   }
 
-  private parseInput(data: CreateRoomInput): Room {
+  private parseInputRoomCreate(data: RoomInput): Room {
     return {
       bathroomType: data.bathroomType,
       description: data.description,
@@ -164,6 +194,32 @@ export class RoomService {
       },
       address: {
         create: {
+          type: AddressType.R,
+          street: data.street,
+          number: data.number,
+          other: data.other,
+          postalCode: data.postalCode.toUpperCase(),
+          city: {
+            connect: {
+              id: data.cityId
+            }
+          }
+        }
+      }
+    } as unknown as Room;
+  }
+
+  private parseInputRoomUpdate(data: RoomInput): Room {
+    return {
+      bathroomType: data.bathroomType,
+      description: data.description,
+      gender: data.gender,
+      numberOfRooms: data.numberOfRooms,
+      rentPrice: data.rentPrice,
+      roomType: data.roomType,
+      size: data.size,
+      address: {
+        update: {
           type: AddressType.R,
           street: data.street,
           number: data.number,

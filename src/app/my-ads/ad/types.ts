@@ -1,4 +1,4 @@
-interface CreateRoomFormData {
+export interface RoomFormData {
   roomType: string;
   bathroomType: string;
   gender: string;
@@ -14,7 +14,7 @@ interface CreateRoomFormData {
   provinceId: number;
 }
 
-interface FormErrors {
+export interface FormErrors {
   roomType?: string;
   bathroomType?: string;
   gender?: string;

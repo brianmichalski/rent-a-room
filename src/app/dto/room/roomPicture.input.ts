@@ -1,6 +1,6 @@
 import { IsBoolean, IsEmpty, IsInt, IsNotEmpty, IsOptional, Min } from 'class-validator';
 
-export class CreateRoomPictureInput {
+export class RoomPictureInput {
   @IsNotEmpty()
   public roomId!: number;
 

@@ -1,7 +1,7 @@
 import { AddressType, BathroomType, Gender, Room, RoomPicture, RoomType, User } from '@prisma/client';
 import prisma from '../../../../prisma/client';
-import { CreateRoomInput } from '../../dto/room/createRoom.input';
-import { CreateRoomPictureInput } from '../../dto/room/createRoomPicture.input';
+import { RoomInput } from '../../dto/room/room.input';
+import { RoomPictureInput } from '../../dto/room/roomPicture.input';
 import { RoomService } from '../room.service';
 
 // Jest mock functions
@@ -40,7 +40,7 @@ describe('RoomService', () => {
       (prisma.room.create as jest.Mock).mockResolvedValue(mockRoom);
 
       // Prepare input data
-      const createRoomInput: CreateRoomInput = {
+      const createRoomInput: RoomInput = {
         bathroomType: BathroomType.E,
         description: 'Nice room',
         gender: Gender.F,
@@ -99,7 +99,7 @@ describe('RoomService', () => {
 
       (prisma.room.findFirst as jest.Mock).mockResolvedValue({ id: roomId, owner: { id: ownerUser.id } });
       // Prepare input data
-      const createRoomPictureInput: CreateRoomPictureInput = {
+      const createRoomPictureInput: RoomPictureInput = {
         roomId: roomId,
         isCover: true,
         order: 1,
@@ -143,7 +143,7 @@ describe('RoomService', () => {
       const roomId = 1;
       (prisma.room.findFirst as jest.Mock).mockResolvedValue({ id: roomId, owner: { id: ownerUser.id } });
       // Prepare input data
-      const createRoomPictureInput: CreateRoomPictureInput = {
+      const createRoomPictureInput: RoomPictureInput = {
         roomId: roomId,
         isCover: false,
         order: 2,
@@ -173,7 +173,7 @@ describe('RoomService', () => {
     (prisma.roomPicture.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
     (prisma.$transaction as jest.Mock).mockResolvedValue([{}, {}, mockPicture]);
     // Prepare input data
-    const createRoomPictureInput: CreateRoomPictureInput = {
+    const createRoomPictureInput: RoomPictureInput = {
       roomId: 1,
       isCover: true,
       order: 2,

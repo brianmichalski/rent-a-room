@@ -37,7 +37,7 @@ const UpdateAccountForm = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-6 rounded-md shadow-md space-y-4">
       <h2 className="text-xl font-semibold text-gray-700">Update Account</h2>
-      {formState === 'updated' ? (
+      {formState === 'saved' ? (
         <div className='text-center mt-8 p-2 bg-green-100 text-green-500 rounded-md'>
           Account updated successfully!
         </div>

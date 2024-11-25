@@ -4,8 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getToken, JWT } from 'next-auth/jwt';
 import { createMocks, RequestMethod } from 'node-mocks-http';
 import prisma from '../../prisma/client';
-import { CreateRoomInput } from '../app/dto/room/createRoom.input';
-import { UpdateRoomInput } from '../app/dto/room/updateRoom.input';
+import { RoomInput } from '../app/dto/room/room.input';
 import RoomRouter from '../pages/api/room/[[...params]]';
 import UserRouter from '../pages/api/user/[[...params]]';
 
@@ -15,7 +14,7 @@ const mockedGetToken = getToken as jest.MockedFunction<typeof getToken>;
 const apiBaseUrl = '/api/room';
 
 // Shared data constants
-const validRoomData: UpdateRoomInput | null = {
+const validRoomData: RoomInput | null = {
   roomType: "S",
   bathroomType: "E",
   gender: "X",
@@ -28,8 +27,7 @@ const validRoomData: UpdateRoomInput | null = {
   other: faker.lorem.paragraph(1),
   postalCode: "A1B2C3",
   cityId: 0,
-  ownerId: 0,
-  roomId: 0
+  ownerId: 0
 };
 
 const validOwnerData = {
@@ -55,7 +53,7 @@ async function createCityAndRoomData() {
     data: { name: 'Waterloo', provinceId: province.id }
   });
 
-  (validRoomData as UpdateRoomInput).cityId = city.id;
+  (validRoomData as RoomInput).cityId = city.id;
   validOwnerData.cityId = city.id;
 }
 
@@ -132,8 +130,6 @@ describe("Room API - Room Creation Flow", () => {
   test.each(createRoomFlowCases)(
     '%s',
     async (description, useToken, roomData, expectedStatus, expectedMessage, upgradeToOwner = false) => {
-      delete (roomData as UpdateRoomInput).roomId;
-
       // Mock token based on the test case
       await mockTokenForUser((useToken ? actualOwnerUser : null) as User);
 
@@ -150,7 +146,7 @@ describe("Room API - Room Creation Flow", () => {
       const { req: reqCreateRoom, res: resCreateRoom } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
         url: apiBaseUrl,
-        body: roomData as CreateRoomInput,
+        body: roomData as RoomInput,
       });
 
       await RoomRouter(reqCreateRoom, resCreateRoom);
@@ -234,7 +230,7 @@ describe("Room API - Room Update and Delete Flows", () => {
       const { req: reqCreateRoom, res: resCreateRoom } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
         url: apiBaseUrl,
-        body: roomData as CreateRoomInput,
+        body: roomData as RoomInput,
       });
       await RoomRouter(reqCreateRoom, resCreateRoom);
       expect(resCreateRoom._getStatusCode()).toBe(useToken ? 201 : 401);
@@ -245,8 +241,7 @@ describe("Room API - Room Update and Delete Flows", () => {
       }
 
       const newRoom = resCreateRoom._getData();
-      (roomData as UpdateRoomInput).roomId = newRoom.id;
-      (roomData as UpdateRoomInput).description = newRoomDescription;
+      (roomData as RoomInput).description = newRoomDescription;
 
       // Update/delete the room
       const method: RequestMethod = (requestMethod as RequestMethod);
@@ -254,8 +249,8 @@ describe("Room API - Room Update and Delete Flows", () => {
       if (method === 'PUT') {
         httpParams = {
           method: method,
-          url: apiBaseUrl,
-          body: roomData as UpdateRoomInput,
+          url: `${apiBaseUrl}/${newRoom.id}`,
+          body: roomData as RoomInput,
         };
       } else if (method === 'DELETE') {
         httpParams = {

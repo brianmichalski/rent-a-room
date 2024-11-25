@@ -1,11 +1,15 @@
 'use client';
 
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { BathroomType, Gender, RoomType } from '@prisma/client';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import Breadcrumb from '../../components/breadcrumb';
 import CitySelect from '../../components/input/city-select';
 import ProvinceSelect from '../../components/input/province-select';
 import useForm from './hooks/useForm';
+import { RoomFormData } from './types';
 
 // Initial Form Data
 const initialFormData = {
@@ -22,9 +26,13 @@ const initialFormData = {
   cityId: 0,
   provinceId: 0,
   other: ''
-} as CreateRoomFormData;
+} as RoomFormData;
 
 const CreateRoomPage = () => {
+  const searchParams = useSearchParams(); // Retrieve query parameters
+  const id = searchParams?.get('id'); // Get adId from query
+  const isEditMode: boolean = !!id;
+
   // --- Hook calls ---
   const {
     isLoading,
@@ -33,16 +41,22 @@ const CreateRoomPage = () => {
     validationErrors,
     handleChange,
     handleSubmit,
-  } = useForm(initialFormData);
+  } = useForm(Number(id), initialFormData);
 
   const [activeTab, setActiveTab] = useState<'room' | 'address'>('room');
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-ads', label: 'My Ads' }, { href: '/my-ads/new', label: 'New' }]} />
-      <h1 className="text-3xl font-semibold mb-6">New Ad</h1>
+      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-ads', label: 'My Ads' }, { href: '/my-ads/ad', label: 'New' }]} />
+      <div className='flex gap-x-2 items-center mb-6'>
+        <Link href={'/my-ads/'} title='Go back' className='p-2 hover:bg-gray-100'>
+          <ChevronLeftIcon className='text-blue-600' width={24} />
+        </Link>
+        <h1 className="text-3xl font-semibold">{isEditMode ? 'Edit Ad' : 'New Ad'}</h1>
+        {isEditMode ? <span className='text-gray-500'>#{id}</span> : ''}
+      </div>
       <div className='block '>
-        {formState === 'updated' ?
+        {formState === 'saved' ?
           <div className='text-center mt-8 p-2 bg-green-100 text-green-500 rounded-md'>
             Add saved successfully!
           </div>

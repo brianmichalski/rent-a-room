@@ -36,7 +36,7 @@ describe('AddressInput Validation', () => {
     addressInput.number = undefined as unknown as number;
     const errors = await validate(addressInput);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].constraints?.isNotEmpty).toBeDefined();
+    expect(errors[0].constraints?.min).toBeDefined();
   });
 
   it('should pass if "other" field is empty (optional)', async () => {

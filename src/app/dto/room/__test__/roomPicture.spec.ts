@@ -1,11 +1,11 @@
 import { validate } from 'class-validator';
-import { CreateRoomPictureInput } from '../createRoomPicture.input';
+import { RoomPictureInput } from '../roomPicture.input';
 
 describe('CreateRoomPictureInput Class Fields Validation', () => {
-  let createRoomPictureInput: CreateRoomPictureInput;
+  let createRoomPictureInput: RoomPictureInput;
 
   beforeEach(() => {
-    createRoomPictureInput = new CreateRoomPictureInput();
+    createRoomPictureInput = new RoomPictureInput();
     createRoomPictureInput.roomId = 1;
     createRoomPictureInput.isCover = true;
     createRoomPictureInput.order = 1;

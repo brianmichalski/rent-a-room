@@ -1,3 +1,4 @@
+import { AddressType } from "@prisma/client";
 import { FormData } from "../types";
 
 export const useFetchUserData = (
@@ -21,7 +22,7 @@ export const useFetchUserData = (
         postalCode: data.address?.postalCode || '',
         cityId: data.address?.cityId || 0,
         provinceId: data.address?.city?.provinceId || 0,
-        type: data.address?.type || 'Residential',
+        type: data.address?.type || AddressType.R,
       });
     } catch (error) {
       console.error('Error fetching user data:', error);

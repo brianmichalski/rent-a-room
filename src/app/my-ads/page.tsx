@@ -12,7 +12,6 @@ const MyAds = () => {
   const { rooms, loading, fetchRooms } = useRooms();
   const {
     dialogOpen,
-    selectedId,
     handleDeleteRoom,
     handleConfirmDelete,
     handleCancelDialog,
@@ -40,8 +39,8 @@ const MyAds = () => {
           <>
             <div className="w-full flex mb-6">
               <Link
-                href={'my-ads/new'}
-                title="Add new room"
+                href={'my-ads/ad'}
+                title="New Ad"
                 className="p-3 text-white font-semibold rounded-md bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
               >
                 <PlusCircleIcon width={24} />
@@ -82,15 +81,14 @@ const MyAds = () => {
                       <td className="px-4 py-2">{room.numberOfRooms}</td>
                       <td className="px-4 py-2 hidden sm:table-cell">
                         <span
-                          className={`px-2 py-1 text-sm font-semibold rounded-lg ${room.isRented ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
-                            }`}
-                        >
+                          className={`px-2 py-1 text-sm font-semibold rounded-lg
+                          ${room.isRented ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
                           {room.isRented ? 'Rented' : 'Available'}
                         </span>
                       </td>
                       <td className="px-4 py-2">
                         <div className='flex'>
-                          <Link href={`/my-ads/edit/${room.id}`} title="Edit Ad" className='crud-action'>
+                          <Link href={`/my-ads/ad?id=${room.id}`} title="Edit Ad" className='crud-action'>
                             <PencilSquareIcon width={24} />
                           </Link>
                           <button onClick={() => handleDeleteRoom(room.id)} title="Remove Ad" className='crud-action'>

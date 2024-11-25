@@ -8,7 +8,7 @@ const useForm = (initialData: FormData) => {
   const [formData, setFormData] = useState<FormData>(initialData);
   const [validationErrors, setValidationErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [formState, setFormState] = useState<'initial' | 'updated' | 'error'>('initial');
+  const [formState, setFormState] = useState<'initial' | 'saved' | 'error'>('initial');
 
   const { fetchUserData } = useFetchUserData(setFormData, setIsLoading);
   useEffect(() => {
@@ -39,9 +39,9 @@ const useForm = (initialData: FormData) => {
 
       if (response.ok) {
         setValidationErrors({});
-        setFormState('updated');
+        setFormState('saved');
       } else {
-        const errors = extractValidationErrors<FormErrors, FormData>(responseText, formData, validationErrors);
+        const errors = extractValidationErrors<FormErrors, FormData>(responseText, formData);
         setFormState('error');
         setValidationErrors(errors);
       }

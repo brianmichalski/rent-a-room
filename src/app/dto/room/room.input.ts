@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { AddressInput } from '../address.input';
 
-export class CreateRoomInput extends AddressInput {
+export class RoomInput extends AddressInput {
   @IsEnum(RoomType, { message: 'Select a valid option for Room Type' })
   public roomType!: RoomType;
 

@@ -1,7 +1,6 @@
 export function extractValidationErrors<FormErrors, FormData>(
   httpResponse: string,
-  formData: FormData,
-  validationErrors: FormErrors
+  formData: FormData
 ): FormErrors {
   const { errors } = JSON.parse(httpResponse);
 

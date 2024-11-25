@@ -1,4 +1,4 @@
-import { Room, RoomPicture } from '@prisma/client';
+import { Room } from '@prisma/client';
 import {
   Body,
   Delete,
@@ -12,8 +12,7 @@ import {
 } from 'next-api-decorators';
 import { type JWT } from 'next-auth/jwt';
 import prisma from '../../../../prisma/client';
-import { CreateRoomInput } from '../../../app/dto/room/createRoom.input';
-import { UpdateRoomInput } from '../../../app/dto/room/updateRoom.input';
+import { RoomInput } from '../../../app/dto/room/room.input';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
 
@@ -29,7 +28,15 @@ class RoomRouter {
   @Get('/my-rooms')
   @HttpCode(201)
   public async getAllRooms(@GetToken() token: JWT): Promise<Room[]> {
-    return await this.roomService.getAll(token.id);
+    return await this.roomService.getAllByOwnerId(token.id);
+  }
+
+  // GET /api/room/:id (get one)
+  @Get("/:id")
+  @HttpCode(200)
+  public async getById(
+    @Param("id") roomId: number): Promise<Room> {
+    return await this.roomService.getById(Number(roomId));
   }
 
   // GET /api/room/:id/cover (get room cover picture)
@@ -45,7 +52,7 @@ class RoomRouter {
   @Post()
   @HttpCode(201)
   public async createRoom(
-    @Body(ValidationPipe) body: CreateRoomInput,
+    @Body(ValidationPipe) body: RoomInput,
     @GetToken() token: JWT): Promise<Room> {
 
     body.ownerId = token.id;
@@ -54,14 +61,15 @@ class RoomRouter {
 
   // PUT /api/room (update one)
   @NextAuthGuard()
-  @Put()
+  @Put('/:id')
   @HttpCode(201)
   public async updateRoom(
-    @Body(ValidationPipe) body: UpdateRoomInput,
+    @Param("id") roomId: number,
+    @Body(ValidationPipe) body: RoomInput,
     @GetToken() token: JWT): Promise<Room> {
 
     body.ownerId = token.id;
-    return await this.roomService.updateRoom(body);
+    return await this.roomService.updateRoom(Number(roomId), body);
   }
 
   // DELETE /api/room/:id (delete one)

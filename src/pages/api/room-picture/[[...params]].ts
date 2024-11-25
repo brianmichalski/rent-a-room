@@ -8,12 +8,12 @@ import {
   Request,
   createHandler
 } from 'next-api-decorators';
+import { type JWT } from 'next-auth/jwt';
 import prisma from '../../../../prisma/client';
-import { CreateRoomPictureInput } from '../../../app/dto/room/createRoomPicture.input';
+import { RoomPictureInput } from '../../../app/dto/room/roomPicture.input';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
 import { parseFormWithFile } from '../../../utils/api';
-import { type JWT } from 'next-auth/jwt';
 
 class RooomPictureRouter {
   protected roomService: RoomService;
@@ -45,11 +45,11 @@ class RooomPictureRouter {
     const uploadedFiles = Array.isArray(files.file) ? files.file : [files.file];
 
     // Convert the parsed fields (which are strings) into the DTO class instance
-    const body = plainToClass(CreateRoomPictureInput, {
+    const body = plainToClass(RoomPictureInput, {
       roomId: Number(fields.roomId),
       isCover: Boolean(fields.isCover),
       order: Number(fields.order)
-    } as CreateRoomPictureInput);
+    } as RoomPictureInput);
 
     // Validate the DTO instance
     await validateOrReject(body);
