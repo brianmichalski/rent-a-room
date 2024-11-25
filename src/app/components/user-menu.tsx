@@ -1,7 +1,7 @@
 import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/react";
 import { ArrowRightEndOnRectangleIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, DocumentTextIcon, HomeModernIcon, StarIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const UserMenu: React.FC = () => {
   const products = [
@@ -10,17 +10,27 @@ const UserMenu: React.FC = () => {
     { name: 'Favorites', description: 'Handle your favorite ads', href: '#', icon: StarIcon },
     { name: 'My Account', description: 'Manage your data, password and more', href: '/my-account', icon: UserCircleIcon },
     { name: 'Platform Policy', description: 'Know our terms and conditions', href: '#', icon: DocumentTextIcon },
-    { name: 'Sign out', description: 'End session', href: '#', action: () => { signOut({ callbackUrl: "/" }); }, icon: ArrowRightEndOnRectangleIcon },
+    { name: 'Sign out', description: 'End session', action: () => { signOut({ callbackUrl: "/" }); }, icon: ArrowRightEndOnRectangleIcon },
   ];
 
   const { data: session } = useSession();
+
+  const router = useRouter();
+
+  const handleMenuClick = (url?: string, action?: () => void) => {
+    if (url) {
+      router.push(url);
+    } else if (action != null) {
+      action();
+    }
+  };
 
   return (
     <PopoverGroup className="hidden lg:flex lg:gap-x-12">
       <Popover className="relative">
         <PopoverButton className="flex items-center gap-x-1 py-2 px-4 rounded font-semibold text-gray-900">
           <UserCircleIcon className="size-5 flex-none" />{' '} {session?.user?.name?.split(' ')[0]}
-          <ChevronDownIcon aria-hidden="true" className="size-5 flex-none"/>
+          <ChevronDownIcon aria-hidden="true" className="size-5 flex-none" />
         </PopoverButton>
 
         <PopoverPanel
@@ -37,10 +47,9 @@ const UserMenu: React.FC = () => {
                   <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-indigo-600" />
                 </div>
                 <div className="flex-auto">
-                  <Link onClick={item.action} href={item.href} title={item.description} className="block font-semibold text-gray-900">
+                  <PopoverButton onClick={() => handleMenuClick(item.href, item.action)} title={item.description} className="block font-semibold text-gray-900">
                     {item.name}
-                    <span className="absolute inset-0" />
-                  </Link>
+                  </PopoverButton>
                 </div>
               </div>
             ))}

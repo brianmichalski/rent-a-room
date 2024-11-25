@@ -103,7 +103,7 @@ describe('RoomService', () => {
         roomId: roomId,
         isCover: true,
         order: 1,
-        url: 'public/img/rooms/image.jpg',
+        urls: 'public/img/rooms/image.jpg',
         ownerId: ownerUser.id
       };
 
@@ -112,7 +112,7 @@ describe('RoomService', () => {
       expect(prisma.roomPicture.create).toHaveBeenCalledWith({
         data: {
           order: createRoomPictureInput.order,
-          url: createRoomPictureInput.url,
+          url: createRoomPictureInput.urls,
           isCover: createRoomPictureInput.isCover,
           room: {
             connect: { id: createRoomPictureInput.roomId }
@@ -147,7 +147,7 @@ describe('RoomService', () => {
         roomId: roomId,
         isCover: false,
         order: 2,
-        url: 'public/img/rooms/image2.jpg',
+        urls: 'public/img/rooms/image2.jpg',
         ownerId: ownerUser.id
       };
 
@@ -177,7 +177,7 @@ describe('RoomService', () => {
       roomId: 1,
       isCover: true,
       order: 2,
-      url: 'public/img/rooms/image2.jpg',
+      urls: 'public/img/rooms/image2.jpg',
       ownerId: ownerUser.id
     };
 

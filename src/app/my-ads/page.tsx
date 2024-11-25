@@ -1,6 +1,6 @@
 'use client'
 
-import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, PhotoIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import Breadcrumb from '../components/breadcrumb';
@@ -88,6 +88,9 @@ const MyAds = () => {
                       </td>
                       <td className="px-4 py-2">
                         <div className='flex'>
+                          <Link href={`/my-ads/ad/gallery?roomId=${room.id}`} title="Edit Ad" className='crud-action'>
+                            <PhotoIcon width={24} />
+                          </Link>
                           <Link href={`/my-ads/ad?id=${room.id}`} title="Edit Ad" className='crud-action'>
                             <PencilSquareIcon width={24} />
                           </Link>

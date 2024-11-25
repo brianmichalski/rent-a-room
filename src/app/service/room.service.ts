@@ -3,6 +3,7 @@ import { BadRequestException, NotFoundException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { RoomInput } from "../dto/room/room.input";
 import { RoomPictureInput } from "../dto/room/roomPicture.input";
+import { RoomPictureOrderInput } from "../dto/room/roomPictureOrder.input";
 
 export class RoomService {
   private prisma;
@@ -67,6 +68,19 @@ export class RoomService {
     return result?.url;
   }
 
+  public async getImages(roomId: number) {
+    return await this.prisma.roomPicture.findMany(
+      {
+        where: {
+          roomId: roomId
+        },
+        orderBy: {
+          order: "asc"
+        }
+      }
+    );
+  }
+
   public async createRoom(data: RoomInput): Promise<Room> {
 
     await this.checkOwnerPreconditions(data.ownerId);
@@ -100,58 +114,120 @@ export class RoomService {
     return (result != null);
   }
 
-  public async createRoomPicture(data: RoomPictureInput): Promise<RoomPicture> {
+  public async createRoomPicture(data: RoomPictureInput): Promise<boolean> {
+    const lastPicture = await this.prisma.roomPicture.findFirst({
+      take: 1,
+      select: {
+        order: true
+      },
+      where: {
+        roomId: data.roomId
+      },
+      orderBy: {
+        order: "desc"
+      }
+    });
 
-    await this.checkOwnerPreconditions(data.ownerId, data.roomId);
+    await this.checkOwnerPreconditions(Number(data.ownerId), data.roomId);
 
-    const roomId = data.roomId;
-    const createPicture = this.prisma.roomPicture.create({
+    if (!data.urls?.length) {
+      return false;
+    }
+
+    const newPictures = data.urls?.map(url => ({
+      order: (lastPicture?.order ?? 0) + 1,
+      url: String(url),
+      isCover: false,
+      roomId: data.roomId
+    }));
+
+    const createPictures = await this.prisma.roomPicture.createMany({
+      data: newPictures
+    });
+
+    // prevent changing the cover if a picture already exists
+    if (lastPicture) {
+      await this.setNewCoverPicture(data.roomId);
+    }
+    return createPictures.count > 0;
+  }
+
+  public async updateRoomPictureOrder(id: number, data: RoomPictureOrderInput): Promise<RoomPicture> {
+    const picture = await this.checkPicturePreconditions(id, data.ownerId ?? 0);
+
+    // Switch the 'order' field values with the image that previously held the position
+    await this.prisma.roomPicture.updateMany({
       data: {
-        order: data.order,
-        url: data.url,
-        isCover: data.isCover,
-        room: {
-          connect: {
-            id: roomId
-          }
+        order: picture.order
+      },
+      where: {
+        NOT: {
+          id: id
+        },
+        order: data.order
+      }
+    });
+
+    /* Determine if the picture will be used as the cover by checking
+      if there is any picture in the position before the new one. */
+    const previousPicture = await this.prisma.roomPicture.findFirst({
+      where: {
+        order: {
+          lt: data.order
         }
       }
     });
-    // increment the order of pictures that should be 'after' the new picture
-    const adjustPicturesOrder = this.prisma.roomPicture.updateMany({
-      where: {
-        roomId: roomId,
-        order: { gte: data.order }
-      },
+
+    // Finish the switching
+    return await this.prisma.roomPicture.update({
       data: {
-        order: { increment: 1 }
+        isCover: !previousPicture,
+        order: data.order
       },
+      where: {
+        id: id
+      }
     });
+  }
 
-    // prepare the batch for the transaction
-    const commands = [];
-    if (data.isCover) {
-      // if the picture is the new cover, unset the previous one
-      const unsetPictureCover = this.prisma.roomPicture.updateMany({
-        where: {
-          roomId: roomId,
-          isCover: true
-        },
-        data: {
-          isCover: false
-        },
-      });
-      commands.push(unsetPictureCover);
+  public async deleteRoomPicture(id: number, ownerId: number): Promise<void> {
+    // TODO: delete the file from the system
+
+    await this.checkPicturePreconditions(id, ownerId);
+    const deletedPicture = await this.prisma.roomPicture.delete({
+      where: { id: id }
+    });
+    if (!deletedPicture.isCover) {
+      return;
     }
-    commands.push(adjustPicturesOrder);
-    commands.push(createPicture);
+    await this.setNewCoverPicture(deletedPicture.roomId);
+  }
 
-    const result = await this.prisma.$transaction(
-      commands
-    );
-    // if data.isCover, the transaction will return 3 results. Otherwise, it will return 2.
-    const createdPicture = commands.length === 3 ? result[2] : result[1];
-    return createdPicture as RoomPicture;
+  private async setNewCoverPicture(roomId: number) {
+    // sets the new cover automatically
+    const newFirstPicture = await this.prisma.roomPicture.findFirst({
+      take: 1,
+      select: {
+        id: true
+      },
+      where: {
+        roomId: roomId
+      },
+      orderBy: {
+        order: "asc"
+      }
+    });
+    if (!newFirstPicture) {
+      return;
+    }
+    await this.prisma.roomPicture.update({
+      data: {
+        isCover: true
+      },
+      where: {
+        id: newFirstPicture?.id
+      }
+    });
   }
 
   private async checkOwnerPreconditions(ownerId: number, roomId?: number) {
@@ -176,6 +252,26 @@ export class RoomService {
     if (room.owner?.id !== ownerId) {
       throw new BadRequestException("Room belongs to a different user");
     }
+  }
+
+  private async checkPicturePreconditions(roomPictureId: number, ownerId: number) {
+    if (!ownerId) {
+      throw new BadRequestException('Owner ID not provided');
+    }
+
+    const picture = await this.prisma.roomPicture.findFirst({
+      where: {
+        id: roomPictureId
+      }
+    });
+
+    if (!picture) {
+      throw new NotFoundException('Picture not found');
+    }
+
+    await this.checkOwnerPreconditions(ownerId, picture?.roomId);
+
+    return picture;
   }
 
   private parseInputRoomCreate(data: RoomInput): Room {

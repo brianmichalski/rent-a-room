@@ -54,7 +54,7 @@ const RegisterPage = () => {
         router.push('/auth/signin');
       } else {
         const errors = extractValidationErrors<FormErrors, RegisterFormData>(
-          responseText, formData, validationErrors
+          responseText, formData
         );
         setValidationErrors(errors);
       }
