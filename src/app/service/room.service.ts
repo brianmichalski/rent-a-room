@@ -132,6 +132,9 @@ export class RoomService {
 
   public async deleteRoom(roomId: number, ownerId: number): Promise<boolean> {
     await this.checkOwnerPreconditions(ownerId, roomId);
+    await this.prisma.roomPicture.deleteMany({
+      where: { roomId: roomId }
+    });
     const result = await this.prisma.room.delete({
       where: { id: roomId }
     });

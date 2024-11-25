@@ -3,6 +3,7 @@
 import {
   closestCenter,
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -88,7 +89,7 @@ const PictureGalleryPage: React.FC = () => {
   );
 
   // Handle drag end
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
