@@ -1,5 +1,3 @@
-// hooks/useDeleteRoom.ts
-
 import { useState } from 'react';
 
 export const useDeleteRoom = (fetchRooms: () => Promise<void>) => {

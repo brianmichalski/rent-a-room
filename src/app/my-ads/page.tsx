@@ -1,21 +1,26 @@
-'use client'
+'use client';
 
-import { PencilSquareIcon, PhotoIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { LockClosedIcon, LockOpenIcon, PencilSquareIcon, PhotoIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import Breadcrumb from '../components/breadcrumb';
 import CustomDialog from '../components/modal';
+import { useChangeRoomAvailability } from './hooks/useChangeRoomAvailability';
 import { useDeleteRoom } from './hooks/useDeleteRoom';
 import { useRooms } from './hooks/useRooms';
 
 const MyAds = () => {
-  const { rooms, loading, fetchRooms } = useRooms();
+  const { rooms, loading, fetchRooms, setRooms } = useRooms();
   const {
     dialogOpen,
     handleDeleteRoom,
     handleConfirmDelete,
     handleCancelDialog,
   } = useDeleteRoom(fetchRooms);
+
+  const {
+    handleChangeRoomAvailability,
+  } = useChangeRoomAvailability(setRooms); // Pass setRooms to the hook
 
   return (
     <>
@@ -88,7 +93,15 @@ const MyAds = () => {
                       </td>
                       <td className="px-4 py-2">
                         <div className='flex'>
-                          <Link href={`/my-ads/ad/gallery?roomId=${room.id}`} title="Edit Ad" className='crud-action'>
+                          <button onClick={() => handleChangeRoomAvailability(room.id)}
+                            title={room.isRented ? 'Mark as Available' : 'Mark as Rented'}
+                            className='crud-action'>
+                            {room.isRented
+                              ? <LockOpenIcon width={24} />
+                              : <LockClosedIcon width={24} />
+                            }
+                          </button>
+                          <Link href={`/my-ads/ad/gallery?roomId=${room.id}`} title="Edit Gallery" className='crud-action'>
                             <PhotoIcon width={24} />
                           </Link>
                           <Link href={`/my-ads/ad?id=${room.id}`} title="Edit Ad" className='crud-action'>

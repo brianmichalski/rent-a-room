@@ -31,6 +31,9 @@ export class RoomService {
           id: ownerId
         }
       },
+      orderBy: {
+        createdAt: "desc"
+      }
     });
   }
 
@@ -92,7 +95,7 @@ export class RoomService {
     return newRoom;
   }
 
-  public async updateRoom(id: number, data: RoomInput): Promise<Room> {
+  public async updateRoom(id: number, data: RoomInput | Room): Promise<Room> {
 
     await this.checkOwnerPreconditions(data.ownerId, id);
 
@@ -101,9 +104,30 @@ export class RoomService {
       where: {
         id: id
       },
-      data: this.parseInputRoomUpdate(data)
+      data: data instanceof RoomInput
+        ? this.parseInputRoomUpdate(data)
+        : data
     });
     return updatedRoom;
+  }
+
+  public async updateRoomAvailability(id: number, ownerId: number): Promise<Room | undefined> {
+    const room = await this.prisma.room.findFirst({
+      select: {
+        isRented: true
+      },
+      where: {
+        id: id
+      }
+    });
+    if (!room) {
+      return;
+    }
+    const data: Room = {
+      isRented: !room.isRented,
+      ownerId: ownerId
+    } as Room;
+    return await this.updateRoom(id, data);
   }
 
   public async deleteRoom(roomId: number, ownerId: number): Promise<boolean> {

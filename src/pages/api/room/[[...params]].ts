@@ -78,6 +78,17 @@ class RoomRouter {
     return await this.roomService.updateRoom(Number(roomId), body);
   }
 
+  // PUT /api/room (update one)
+  @NextAuthGuard()
+  @Put('/:id/availability')
+  @HttpCode(201)
+  public async updateRoomAvailability(
+    @Param("id") roomId: number,
+    @GetToken() token: JWT): Promise<Room | undefined> {
+
+    return await this.roomService.updateRoomAvailability(Number(roomId), token.id);
+  }
+
   // DELETE /api/room/:id (delete one)
   @NextAuthGuard()
   @Delete("/:id")

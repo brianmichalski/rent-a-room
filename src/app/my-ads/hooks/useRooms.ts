@@ -1,19 +1,6 @@
-// hooks/useRooms.ts
-
 import { Room } from '@prisma/client';
 import { useEffect, useState } from 'react';
-
-interface RoomWithCover {
-  id: number;
-  roomType: string;
-  bathroomType: string;
-  gender: string;
-  rentPrice: number;
-  size: number;
-  numberOfRooms: number;
-  isRented: boolean;
-  coverImageUrl: string;
-}
+import { RoomWithCover } from '../types';
 
 export const useRooms = () => {
   const [rooms, setRooms] = useState<RoomWithCover[]>([]);
@@ -45,5 +32,5 @@ export const useRooms = () => {
     fetchRooms();
   }, []);
 
-  return { rooms, loading, fetchRooms };
+  return { rooms, loading, fetchRooms, setRooms };
 };
