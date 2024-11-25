@@ -40,7 +40,7 @@ const PictureGalleryPage: React.FC = () => {
     fetch(`/api/room/${roomId}/picture`)
       .then((res) => res.json())
       .then((data) => {
-        setImages(data.sort((a: Image, b: Image) => a.order - b.order));
+        setImages(data ? data.sort((a: Image, b: Image) => a.order - b.order) : {});
         setIsLoading(false);
       })
       .catch((err) => {
@@ -156,26 +156,32 @@ const PictureGalleryPage: React.FC = () => {
         <p className="text-lg text-gray-500">Drag & Drop or Click on this area to browse and upload images</p>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={images.map((image) => image.id.toString())}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {isLoading ? (
-              <p>Loading images...</p>
-            ) : (
-              images.map((image) => (
-                <SortableItem key={image.id} id={image.id.toString()} url={image.url} onRemoveClick={handleDelete} />
-              ))
-            )}
-          </div>
-        </SortableContext>
-      </DndContext>
+      <div className="flex flex-col justify-between">
+        {images?.length ? <>
+          <p className="mb-4 text-right text-sm text-blue-400">Drag & Drop to sort the images</p>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={images?.map((image) => image?.id?.toString())}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {isLoading ? (
+                  <p>Loading images...</p>
+                ) : (
+                  images.map((image) => (
+                    <SortableItem key={image.id} id={image.id.toString()} url={image.url} onRemoveClick={handleDelete} />
+                  ))
+                )}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </>
+          : ''}
+      </div>
     </div>
   );
 };

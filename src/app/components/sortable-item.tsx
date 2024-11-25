@@ -35,6 +35,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
         width={4} // Aspect ratio
         height={3}
         objectFit="cover"
+        title="Drag and Drop the picture to change its order"
         alt="Image"
         className="rounded-lg"
       />
