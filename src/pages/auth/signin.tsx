@@ -3,8 +3,8 @@ import { getCsrfToken, getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import HomeLink from "../../app/components/home-link";
-import AuthPage from "../../app/components/auth-page";
+import HomeLink from "../../app/components/layout/home-link";
+import AuthPage from "../../app/components/auth/auth-page";
 
 export default function SignIn({
   csrfToken,

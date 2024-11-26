@@ -21,8 +21,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import Breadcrumb from "../../../components/breadcrumb";
-import { SortableItem } from "../../../components/sortable-item";
+import Breadcrumb from "../../../components/layout/breadcrumb";
+import { SortableItem } from "../../../components/image/sortable-item";
 
 interface Image {
   id: number;

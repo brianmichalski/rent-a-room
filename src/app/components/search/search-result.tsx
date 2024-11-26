@@ -1,4 +1,3 @@
-// pages/index.tsx
 import RoomCard from './room-card';
 
 interface Room {

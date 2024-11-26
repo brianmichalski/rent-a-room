@@ -3,8 +3,8 @@
 import { LockClosedIcon, LockOpenIcon, PencilSquareIcon, PhotoIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
-import Breadcrumb from '../components/breadcrumb';
-import CustomDialog from '../components/modal';
+import Breadcrumb from '../components/layout/breadcrumb';
+import CustomDialog from '../components/layout/modal';
 import { useChangeRoomAvailability } from './hooks/useChangeRoomAvailability';
 import { useDeleteRoom } from './hooks/useDeleteRoom';
 import { useRooms } from './hooks/useRooms';

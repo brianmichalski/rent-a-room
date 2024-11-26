@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import AuthPage from '../../app/components/auth-page';
+import AuthPage from '../../app/components/auth/auth-page';
 import { extractValidationErrors } from '../../utils/form';
 
 interface RegisterFormData {

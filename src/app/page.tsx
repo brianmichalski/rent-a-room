@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import FilterAndSort from "../app/components/filter-and-sort";
-import SearchResult from "../app/components/search-result";
+import FilterAndSort from "./components/search/filter-and-sort";
+import SearchResult from "./components/search/search-result";
 
 const Home: React.FC = () => {
   const [filter, setFilter] = useState<string>("all");

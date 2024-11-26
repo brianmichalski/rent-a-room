@@ -2,7 +2,7 @@
 "use client";
 import { SessionProvider } from 'next-auth/react';
 import React from 'react';
-import Header from '../app/components/header';
+import Header from './components/layout/header';
 import '../styles/globals.css'; // Adjust path if necessary
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {

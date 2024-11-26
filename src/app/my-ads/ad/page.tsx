@@ -5,7 +5,7 @@ import { BathroomType, Gender, RoomType } from '@prisma/client';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import Breadcrumb from '../../components/breadcrumb';
+import Breadcrumb from '../../components/layout/breadcrumb';
 import CitySelect from '../../components/input/city-select';
 import ProvinceSelect from '../../components/input/province-select';
 import useForm from './hooks/useForm';

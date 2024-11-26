@@ -1,4 +1,4 @@
-import HomeLink from "./home-link";
+import HomeLink from "../layout/home-link";
 
 const AuthPage: React.FC<{ children: React.ReactNode, title: string }> = ({ children, title }) => {
   return (
