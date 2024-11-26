@@ -78,6 +78,7 @@ const PictureGalleryPage: React.FC = () => {
               throw new Error(errorMessage);
             });
           }
+          setUploadError(undefined);
           return response.json();
         })
         .then((success) => {

@@ -38,10 +38,17 @@ class RooomPictureRouter {
 
     // Parse form-data (fields and files)
     const outputDir = process.env.ROOM_IMAGES_OUTPUT_DIR;
+    const maxFiles = process.env.MAX_FILES_PER_UPLOAD;
+    const maxFileSize = process.env.MAX_FILE_SIZE;
     if (!outputDir) {
       throw new Error("Images output folder not found");
     }
-    const { fields, files } = await parseFormWithFile(req, `/public/${outputDir}`);
+    const { fields, files } = await parseFormWithFile(
+      req,
+      `/public/${outputDir}`,
+      Number(maxFiles ?? 3),
+      Number(maxFileSize ?? 2)
+    );
 
     if (!files) {
       throw new BadRequestException("Image file not included in the request");

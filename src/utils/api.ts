@@ -6,7 +6,9 @@ import path from "path";
 
 export const parseFormWithFile = (
   req: NextApiRequest,
-  fileOutpuDir: string
+  fileOutpuDir: string,
+  maxFiles: number,
+  maxFileSize: number
 ): Promise<{ fields: Fields; files: Files }> => {
   // Ensure the upload directory exists
   const uploadDir = path.join(process.cwd(), fileOutpuDir);
@@ -16,8 +18,9 @@ export const parseFormWithFile = (
   const _form = new IncomingForm({
     uploadDir,
     keepExtensions: true,
-    maxFileSize: 5 * 1024 * 1024, // max file size (5 MB)
+    maxFileSize: (maxFileSize * 1024 * 1024), // max file size (MB)
     multiples: true,
+    maxFiles: maxFiles
   });
 
   const form = _form;
@@ -27,7 +30,13 @@ export const parseFormWithFile = (
     form.parse(req, (err, fields, files) => {
       if (err) {
         if (err.httpCode === 413) {
-          reject(new HttpException(err.httpCode, "File size too large. The maximum accepted is 5MB."));
+          let message = err.message;
+          if (err.message.includes('maxFiles')) {
+            message = `Limit of files exceeded. The maximum is ${maxFiles} simultaneous pictures.`
+          } else if (err.message.includes('maxFileSize')) {
+            message = `Payload size too large. The maximum accepted is ${maxFileSize} MB.`
+          }
+          reject(new HttpException(err.httpCode, message));
         } else {
           reject(new HttpException(400, "Invalid input", err as string[]));
         }
