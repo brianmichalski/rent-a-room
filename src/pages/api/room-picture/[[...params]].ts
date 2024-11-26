@@ -69,18 +69,18 @@ class RooomPictureRouter {
 
   // PUT /api/room-picture/ (update order)
   @NextAuthGuard()
-  @Put('/:id/order')
+  @Put('/order')
   @HttpCode(201)
-  public async updateOrder(
-    @Param("id") id: number,
+  public async swapOrder(
     @Request() req: NextApiRequest,
     @GetToken() token: JWT
   ) {
 
     const { fields } = await parseForm(req);
     const body = plainToClass(RoomPictureOrderInput, {
-      order: Number(fields.order)
-    } as RoomPictureOrderInput);
+      ids: fields.ids?.map(id => Number(id)),
+      ascending: fields.ascending
+    });
 
     try {
       // Validate the DTO instance
@@ -91,7 +91,7 @@ class RooomPictureRouter {
 
     body.ownerId = token.id;
 
-    return this.roomService.updateRoomPictureOrder(Number(id), body);
+    return this.roomService.swapRoomPictureOrder(body);
   }
 
   @NextAuthGuard()

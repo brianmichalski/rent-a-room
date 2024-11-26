@@ -1,8 +1,11 @@
-import { IsEmpty, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsEmpty } from 'class-validator';
 
 export class RoomPictureOrderInput {
-  @Min(1)
-  public order!: number;
+  @IsArray()
+  public ids!: number[];
+
+  @IsBoolean()
+  public ascending!: boolean;
 
   @IsEmpty()
   public ownerId?: number;

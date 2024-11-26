@@ -162,9 +162,10 @@ export class RoomService {
     }
 
     let firstPicture = true;
+    let order = 1 + (lastPicture?.order ?? 0);
     const newPictures = data.urls?.map(url => {
       const result = {
-        order: (lastPicture?.order ?? 0) + 1,
+        order: order++,
         url: String(url),
         isCover: (firstPicture && !lastPicture),
         roomId: data.roomId
@@ -184,42 +185,70 @@ export class RoomService {
     return createPictures.count > 0;
   }
 
-  public async updateRoomPictureOrder(id: number, data: RoomPictureOrderInput): Promise<RoomPicture> {
-    const picture = await this.checkPicturePreconditions(id, data.ownerId ?? 0);
-
-    // Switch the 'order' field values with the image that previously held the position
-    await this.prisma.roomPicture.updateMany({
-      data: {
-        order: picture.order
-      },
-      where: {
-        NOT: {
-          id: id
-        },
-        order: data.order
-      }
-    });
-
-    /* Determine if the picture will be used as the cover by checking
-      if there is any picture in the position before the new one. */
-    const previousPicture = await this.prisma.roomPicture.findFirst({
-      where: {
-        order: {
-          lt: data.order
+  public async swapRoomPictureOrder(data: RoomPictureOrderInput): Promise<RoomPicture> {
+    if (data.ids?.length != 2) {
+      throw new BadRequestException('Invalid input for swapping pictures');
+    }
+    const pictureSource = await this.checkPicturePreconditions(data.ids[0], data.ownerId ?? 0);
+    const pictureTarget = await this.checkPicturePreconditions(data.ids[1], data.ownerId ?? 0);
+    // update the pictures found between pictureA and pictureB
+    if (data.ascending) {
+      // for ascending swapping, 'moves' the pictures before downwards (-1)
+      const picturesBetween = await this.prisma.roomPicture.findMany({
+        where: {
+          order: {
+            gt: pictureSource.order,
+            lte: pictureTarget.order
+          }
         }
+      });
+      await this.prisma.roomPicture.updateMany({
+        data: {
+          order: {
+            increment: -1
+          }
+        },
+        where: {
+          id: {
+            in: picturesBetween.map(p => p.id)
+          }
+        }
+      });
+    } else {
+      // for descending swapping, 'moves' the pictures after upwards (+1)
+      const picturesBetween = await this.prisma.roomPicture.findMany({
+        where: {
+          order: {
+            lt: pictureSource.order,
+            gte: pictureTarget.order
+          }
+        }
+      });
+      await this.prisma.roomPicture.updateMany({
+        data: {
+          order: {
+            increment: 1
+          }
+        },
+        where: {
+          id: {
+            in: picturesBetween.map(p => p.id)
+          }
+        }
+      });
+    }
+
+    // Finally, update the picture that was moved (swap source with target)
+    const resultA = await this.prisma.roomPicture.update({
+      data: {
+        order: pictureTarget.order
+      },
+      where: {
+        id: pictureSource.id
       }
     });
 
-    // Finish the switching
-    return await this.prisma.roomPicture.update({
-      data: {
-        isCover: !previousPicture,
-        order: data.order
-      },
-      where: {
-        id: id
-      }
-    });
+    return resultA;
   }
 
   public async deleteRoomPicture(id: number, ownerId: number): Promise<void> {

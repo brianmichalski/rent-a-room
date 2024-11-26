@@ -105,23 +105,35 @@ const PictureGalleryPage: React.FC = () => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = images.findIndex((img) => img.id === Number(active.id));
-      const newIndex = images.findIndex((img) => img.id === Number(over?.id));
+      const sourcePictureOldIndex = images.findIndex((img) => img.id === Number(active.id));
+      // Prevent the Delete picture to trigger the DragEnd accidentally
+      if (sourcePictureOldIndex < 0) {
+        return;
+      }
+      const targetPictureOldIndex = images.findIndex((img) => img.id === Number(over?.id));
+      const ascending = sourcePictureOldIndex < targetPictureOldIndex;
+      const sourcePicture = images[sourcePictureOldIndex];
+      const targetPicture = images[targetPictureOldIndex];
 
-      const reorderedImages = arrayMove(images, oldIndex, newIndex);
-
-      setImages(reorderedImages);
+      // Sort locally
+      const reorderedImages = arrayMove(images, sourcePictureOldIndex, targetPictureOldIndex);
 
       // Update order on the backend
-      reorderedImages.forEach((image, index) => {
-        fetch(`/api/room-picture/${image.id}/order`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ order: index + 1 }),
-        }).catch((err) => console.error("Error updating order:", err));
-      });
+      fetch(`/api/room-picture/order/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ids: [sourcePicture.id, targetPicture.id],
+          ascending: ascending
+        }),
+      }).then((response) => {
+        if (response.ok) {
+          // Apply local sorting
+          setImages(reorderedImages);
+        }
+      }).catch((err) => console.error("Error updating order:", err));
     }
   };
 
