@@ -70,13 +70,14 @@ const MyAds = () => {
                   {rooms.map((room) => (
                     <tr key={room.id} className="border-b border-gray-200">
                       <td className="px-4 py-2">
-                        <Image
+                        {room.coverImageUrl ? <Image
                           src={room.coverImageUrl}
-                          alt="Room Cover"
+                          alt="Ad Cover"
+                          title="Ad Cover"
                           width={100}
                           height={100}
                           className="rounded-lg"
-                        />
+                        /> : ''}
                       </td>
                       <td className="px-4 py-2">{room.roomType}</td>
                       <td className="px-4 py-2">{room.bathroomType}</td>
@@ -93,6 +94,9 @@ const MyAds = () => {
                       </td>
                       <td className="px-4 py-2">
                         <div className='flex'>
+                          <Link href={`/my-ads/ad/gallery?roomId=${room.id}`} title="Edit Gallery" className='crud-action'>
+                            <PhotoIcon width={24} />
+                          </Link>
                           <button onClick={() => handleChangeRoomAvailability(room.id)}
                             title={room.isRented ? 'Mark as Available' : 'Mark as Rented'}
                             className='crud-action'>
@@ -101,9 +105,6 @@ const MyAds = () => {
                               : <LockClosedIcon width={24} />
                             }
                           </button>
-                          <Link href={`/my-ads/ad/gallery?roomId=${room.id}`} title="Edit Gallery" className='crud-action'>
-                            <PhotoIcon width={24} />
-                          </Link>
                           <Link href={`/my-ads/ad?id=${room.id}`} title="Edit Ad" className='crud-action'>
                             <PencilSquareIcon width={24} />
                           </Link>

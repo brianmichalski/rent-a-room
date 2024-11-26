@@ -18,7 +18,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
   };
 
   const handleClick = (event: React.MouseEvent) => {
-    onRemoveClick(id);  // Call the onRemoveClick function passed down as a prop
+    onRemoveClick(id);
   };
 
   return (
@@ -37,7 +37,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
         objectFit="cover"
         title="Drag and Drop the picture to change its order"
         alt="Image"
-        className="rounded-lg"
+        className="rounded-lg hover:opacity-70 hover:cursor-grab active:cursor-grabbing"
       />
       <div className="absolute top-2 right-2 flex flex-col space-y-2">
         <button

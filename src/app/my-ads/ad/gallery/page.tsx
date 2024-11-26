@@ -151,10 +151,10 @@ const PictureGalleryPage: React.FC = () => {
 
       <div
         {...getRootProps()}
-        className="w-full h-60 border-4 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center mb-6"
+        className="w-full h-60 border-4 border-dashed border-gray-300 hover:bg-gray-200 rounded-xl flex flex-col items-center justify-center mb-6 cursor-pointer"
       >
         <input {...getInputProps()} />
-        <p className="text-lg text-gray-500">Drag & Drop or Click on this area to browse and upload images</p>
+        <p className="text-lg text-gray-500">Drag & Drop your pictures or</p><p className="text-sm text-gray-500">Click to browse and upload</p>
       </div>
 
       <div className="flex flex-col justify-between">
