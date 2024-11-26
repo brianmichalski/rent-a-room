@@ -1,15 +1,118 @@
-import { AddressType, Room, RoomPicture } from "@prisma/client";
+import { AddressType, Prisma, Room, RoomPicture } from "@prisma/client";
 import { BadRequestException, NotFoundException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
 import { RoomInput } from "../dto/room/room.input";
+import { RoomSearch } from "../dto/room/room.search";
 import { RoomPictureInput } from "../dto/room/roomPicture.input";
 import { RoomPictureOrderInput } from "../dto/room/roomPictureOrder.input";
+import { RoomResult } from "../../types/results";
 
 export class RoomService {
   private prisma;
 
   constructor(_prisma: typeof prisma) {
     this.prisma = _prisma;
+  }
+
+  public async getAll(params: RoomSearch) {
+    const [where, orderBy] = this.parseRoomSearchParams(params);
+    const rooms = await this.prisma.room.findMany({
+      include: {
+        address: {
+          include: {
+            city: {
+              include: {
+                province: true
+              }
+            }
+          }
+        },
+        roomPictures: {
+          select: {
+            url: true
+          },
+          orderBy: {
+            order: 'asc'
+          }
+        }
+      },
+      where: where,
+      orderBy: orderBy
+    });
+    return rooms.map(room => ({
+      id: room.id,
+      // room info
+      bathroomType: room.bathroomType,
+      description: room.description,
+      gender: room.gender,
+      isRented: room.isRented,
+      numberOfRooms: room.numberOfRooms,
+      number: room.address?.number,
+      rentPrice: room.rentPrice,
+      roomType: room.roomType,
+      // address
+      size: room.size,
+      street: room.address?.street,
+      postalCode: room.address?.postalCode,
+      other: room.address?.other,
+      city: `${room.address?.city.name}, ${room.address?.city.province.abbreviation}`,
+      // pictures
+      pictures: room.roomPictures.map(p => p.url),
+    }) as RoomResult);
+  }
+
+  private parseRoomSearchParams(params: RoomSearch): [Prisma.RoomWhereInput, Prisma.RoomOrderByWithRelationInput] {
+    const where: Prisma.RoomWhereInput = {};
+    if (params.bathroomType) {
+      where.bathroomType = params.bathroomType;
+    }
+    if (params.description) {
+      where.description = { contains: params.description };
+    }
+    if (params.gender) {
+      where.gender = params.gender;
+    }
+    // number of rooms
+    if (params.numberOfRoomsMin) {
+      where.numberOfRooms = { gte: Number(params.numberOfRoomsMin) };
+    }
+    if (params.numberOfRoomsMax) {
+      where.numberOfRooms = { lte: Number(params.numberOfRoomsMax) };
+    }
+    // rent price
+    if (params.rentPriceMin) {
+      where.rentPrice = { gte: Number(params.rentPriceMin) };
+    }
+    if (params.rentPriceMax) {
+      where.rentPrice = { lte: Number(params.rentPriceMax) };
+    }
+    if (params.roomType) {
+      where.roomType = params.roomType;
+    }
+    // rent price
+    if (params.sizeMin) {
+      where.size = { gte: Number(params.sizeMin) };
+    }
+    if (params.sizeMax) {
+      where.size = { lte: Number(params.sizeMax) };
+    }
+    if (params.cityId) {
+      where.address = {
+        cityId: Number(params.cityId)
+      };
+    }
+
+    const orderBy: Prisma.RoomOrderByWithRelationInput = {};
+    switch (params.sortBy) {
+      case "price":
+        orderBy.rentPrice = params.sortDir;
+        break;
+      case "size":
+        orderBy.size = params.sortDir;
+        break;
+    }
+
+    return [where, orderBy];
   }
 
   public async getAllByOwnerId(ownerId: number) {

@@ -7,14 +7,18 @@ import {
   Param,
   Post,
   Put,
+  Query,
   ValidationPipe,
   createHandler
 } from 'next-api-decorators';
 import { type JWT } from 'next-auth/jwt';
 import prisma from '../../../../prisma/client';
 import { RoomInput } from '../../../app/dto/room/room.input';
+import { RoomSearch } from '../../../app/dto/room/room.search';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
+import { RoomResult } from '../../../types/results';
+import { plainToClass } from 'class-transformer';
 
 class RoomRouter {
   protected roomService: RoomService;
@@ -23,11 +27,11 @@ class RoomRouter {
     this.roomService = new RoomService(prisma);
   }
 
-  // GET /api/room (get all)
+  // GET /api/room (get all from owner)
   @NextAuthGuard()
   @Get('/my-rooms')
   @HttpCode(200)
-  public async getAllRooms(@GetToken() token: JWT): Promise<Room[]> {
+  public async getAll(@GetToken() token: JWT): Promise<Room[]> {
     return await this.roomService.getAllByOwnerId(token.id);
   }
 
@@ -51,6 +55,16 @@ class RoomRouter {
   @HttpCode(200)
   public async getImages(@Param("id") roomId: number): Promise<RoomPicture[] | undefined> {
     return await this.roomService.getImages(Number(roomId));
+  }
+
+  // GET /api/room (get all)
+  @Get()
+  @HttpCode(200)
+  public async getAllRooms(
+    @Query() searchParams: RoomSearch,
+    @GetToken() token: JWT
+  ): Promise<RoomResult[]> {
+    return await this.roomService.getAll(searchParams);
   }
 
   // POST /api/room (create one)

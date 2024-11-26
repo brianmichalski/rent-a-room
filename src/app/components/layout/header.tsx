@@ -10,7 +10,7 @@ import UserMenu from './user-menu';
 const Header: React.FC = () => {
   const { data: session } = useSession();
   return (
-    <nav className="sticky top-0 flex justify-between items-center px-20 py-4 bg-custom-blue">
+    <nav className="z-20 sticky top-0 flex justify-between items-center px-20 py-4 bg-custom-blue">
       <div className="flex items-center gap-x-2 text-xl font-bold">
         <HomeLink />
         RentARoom

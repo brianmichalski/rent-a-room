@@ -1,33 +1,28 @@
-import RoomCard from './room-card';
+import React from "react";
+import { RoomResult } from "../../../types/results";
+import RoomCard from "./room-card"; // Assuming Room type is defined
 
-interface Room {
-  size: string;
-  address: string;
-  price: number;
-}
-
-const rooms: Room[] = [
-  { size: '20m²', address: '120 King St, Waterloo, ON', price: 500 },
-  { size: '25m²', address: '220 Queen St, Waterloo, ON', price: 550 },
-  { size: '30m²', address: '330 Duke St, Waterloo, ON', price: 600 },
-  { size: '20m²', address: '120 King St, Waterloo, ON', price: 500 },
-  { size: '25m²', address: '220 Queen St, Waterloo, ON', price: 550 },
-  { size: '30m²', address: '330 Duke St, Waterloo, ON', price: 600 },
-  { size: '20m²', address: '120 King St, Waterloo, ON', price: 500 },
-  { size: '25m²', address: '220 Queen St, Waterloo, ON', price: 550 },
-  { size: '30m²', address: '330 Duke St, Waterloo, ON', price: 600 },
-  // Add more rooms as necessary
-];
 interface SearchResultProps {
-  results: { name: string; category: string }[];
+  results: RoomResult[];
+  favoriteRooms: Set<number>;
+  onToggleFavorite: (id: number) => void;
 }
 
-const SearchResult: React.FC<SearchResultProps> = ({ results }) => {
+const SearchResult: React.FC<SearchResultProps> = ({ results, favoriteRooms, onToggleFavorite }) => {
   return (
     <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-6 py-6">
-      {rooms.map((room, index) => (
-        <RoomCard key={index} room={room} />
-      ))}
+      {results.length > 0 ? (
+        results.map((room) => (
+          <RoomCard
+            key={room.id}
+            room={room}
+            favoriteRooms={favoriteRooms}
+            onToggleFavorite={onToggleFavorite}
+          />
+        ))
+      ) : (
+        <div className="col-span-full text-center text-gray-500">No rooms found</div>
+      )}
     </div>
   );
 };

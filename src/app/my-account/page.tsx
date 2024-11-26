@@ -1,8 +1,8 @@
 'use client';
 
 import { AddressType } from '@prisma/client';
-import CitySelect from '../components/input/city-select';
-import ProvinceSelect from '../components/input/province-select';
+import CitySelect from '../components/input/city-select/city-select';
+import ProvinceSelect from '../components/input/city-select/province-select';
 import useForm from './hooks/useForm';
 import { FormData } from './types';
 
