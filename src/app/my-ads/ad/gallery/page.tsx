@@ -36,12 +36,13 @@ const PictureGalleryPage: React.FC = () => {
 
   const [images, setImages] = useState<Image[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [uploadError, setUploadError] = useState<string | undefined>(undefined);
 
   const loadImages = () => {
     fetch(`/api/room/${roomId}/picture`)
       .then((res) => res.json())
       .then((data) => {
-        setImages(data ? data.sort((a: Image, b: Image) => a.order - b.order) : {});
+        setImages(data?.length ? data.sort((a: Image, b: Image) => a.order - b.order) : {});
         setIsLoading(false);
       })
       .catch((err) => {
@@ -68,14 +69,25 @@ const PictureGalleryPage: React.FC = () => {
 
       fetch("/api/room-picture", {
         method: "POST",
-        body: formData,
+        body: formData
       })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((errorData) => {
+              const errorMessage = errorData.message || 'Unknown error';
+              throw new Error(errorMessage);
+            });
+          }
+          return response.json();
+        })
         .then((success) => {
           if (success) {
             loadImages();
           }
         })
-        .catch((error) => console.error("Error uploading image:", error));
+        .catch((error) => {
+          setUploadError(error.message ?? error);
+        });
     },
     accept: { "image/*": [] },
   });
@@ -149,6 +161,11 @@ const PictureGalleryPage: React.FC = () => {
         <span className="text-gray-500">#{roomId}</span>
       </div>
 
+      {uploadError
+        ? <div className='text-center mb-4 p-2 bg-red-100 text-red-500 rounded-md'>
+          Upload error: {uploadError}
+        </div>
+        : ''}
       <div
         {...getRootProps()}
         className="w-full h-60 border-4 border-dashed border-gray-300 hover:bg-gray-200 rounded-xl flex flex-col items-center justify-center mb-6 cursor-pointer"

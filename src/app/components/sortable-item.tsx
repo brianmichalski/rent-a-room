@@ -2,6 +2,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { useState } from "react";
+import LoadingImage from "./loading-image";
 
 interface SortableItemProps {
   id: string;
@@ -21,20 +23,25 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
     onRemoveClick(id);
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      className="relative w-full"
+      className={`relative w-full items-center block ${isLoading ? 'bg-gray-200 rounded-md' : ''}`}
     >
+      <LoadingImage isLoading={isLoading} />
       <Image
         src={url}
         layout="responsive"
         width={4} // Aspect ratio
         height={3}
         objectFit="cover"
+        onLoadStart={() => setIsLoading(true)}
+        onLoad={() => setIsLoading(false)}
         title="Drag and Drop the picture to change its order"
         alt="Image"
         className="rounded-lg hover:opacity-70 hover:cursor-grab active:cursor-grabbing"
@@ -42,7 +49,8 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
       <div className="absolute top-2 right-2 flex flex-col space-y-2">
         <button
           onMouseDown={(e) => handleClick(e)}
-          className="text-white bg-black opacity-50 p-1 rounded-full hover:opacity-75"
+          title="Remove picture"
+          className="text-white bg-black opacity-50 p-1 rounded-full hover:bg-red-500 hover:opacity-100 hover"
         >
           <TrashIcon width={16} />
         </button>
