@@ -161,12 +161,17 @@ export class RoomService {
       return false;
     }
 
-    const newPictures = data.urls?.map(url => ({
-      order: (lastPicture?.order ?? 0) + 1,
-      url: String(url),
-      isCover: false,
-      roomId: data.roomId
-    }));
+    let firstPicture = true;
+    const newPictures = data.urls?.map(url => {
+      const result = {
+        order: (lastPicture?.order ?? 0) + 1,
+        url: String(url),
+        isCover: (firstPicture && !lastPicture),
+        roomId: data.roomId
+      };
+      firstPicture = false;
+      return result;
+    });
 
     const createPictures = await this.prisma.roomPicture.createMany({
       data: newPictures
