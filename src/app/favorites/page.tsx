@@ -34,7 +34,7 @@ export default function FavoriteRooms() {
 
   return (
     <div className="container mx-auto p-4">
-      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-ads', label: 'My Ads' }, { href: '/my-ads/ad', label: 'New' }]} />
+      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: '/my-favorites', label: 'Favorites' } ]} />
       <div className='flex gap-x-2 items-center mb-6'>
         <h1 className="text-3xl font-semibold mb-2">Favorite Rooms</h1>
       </div>
