@@ -61,6 +61,7 @@ export default function FavoriteRooms() {
                       alt="Room"
                       width={100}
                       height={60}
+                      quality={60}
                       className="rounded"
                     />
                   ) : (
@@ -79,8 +80,8 @@ export default function FavoriteRooms() {
                 <td className="px-4 py-2 border-b text-center">{`$${room.rentPrice}`}</td>
                 <td className="px-4 py-2 border-b text-center">{`${room.size} m²`}</td>
                 <td className="px-4 py-2 border-b">
-                  <div className='flex space-x-2 w-full justify-end gap-x-2'>
-                    <Link title='Go to details' href={`/room-details/${room.id}`} className='px-2 rounded hover:underline hover:text-blue-600'>
+                  <div className='flex space-x-2 w-full justify-center gap-x-2'>
+                    <Link title='Go to details' href={`/room-details/${room.id}`} className='px-2 rounded hover:underline hover:text-blue-600 font-semibold'>
                       View details
                     </Link>
                     <button

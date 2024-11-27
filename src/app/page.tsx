@@ -9,19 +9,19 @@ import { SelectOption } from "../types/forms";
 const Home: React.FC = () => {
   const sortOptions: SelectOption[] = [
     {
-      description: 'Price: Low to High',
+      description: 'Price - low to high',
       value: 'price.asc'
     },
     {
-      description: 'Price: High to Low',
+      description: 'Price - high to low',
       value: 'price.desc'
     },
     {
-      description: 'Size: Smaller first',
+      description: 'Size - smaller first',
       value: 'size.asc'
     },
     {
-      description: 'Size: Bigger first',
+      description: 'Size - bigger first',
       value: 'size.desc'
     }
   ];

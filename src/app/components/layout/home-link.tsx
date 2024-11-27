@@ -8,6 +8,7 @@ const HomeLink: React.FC = () => {
         <Image
           src="/img/logo.png"
           alt="Logo"
+          quality={75}
           width={48}
           height={48} />
       </Link >

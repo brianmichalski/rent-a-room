@@ -49,12 +49,17 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
           <MapPinIcon className={`glow h-8 w-8 ${selectedCity ? 'text-blue-600' : 'text-gray-400'}`} strokeWidth={1.2} />
           <input
             placeholder="Select a location..."
+            title="Search a city to filter the results"
             value={citySearch}
             onFocus={(e) => e.target.select()}
             onChange={handleCityChange}
-            onBlur={() => {
+            onBlur={(e) => {
               setTimeout(() => {
                 setShowCityOptions(false);
+                if (!selectedCity) {
+                  e.target.value = '';
+                  onCityChange(undefined);
+                }
               }, 200);
             }}
             className="border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -79,10 +84,10 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
       </div>
 
       <div className="flex items-center gap-2">
-        <BarsArrowDownIcon className="glow h-6 w-6 text-gray-300" strokeWidth={1.2} />
+        <span className="text-gray-800">Sort by:</span>
         <select
           onChange={(e) => onSort(e.target.value)}
-          className="bg-gray-200 py-2 pl-4 rounded w-fit"
+          className="py-2 pl-4 rounded w-fit border-gray-300 bg-gray-100"
         >
           {sortOptions.map(option =>
             <option key={option.value} value={option.value}>{option.description}</option>

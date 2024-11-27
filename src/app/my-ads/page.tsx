@@ -68,15 +68,17 @@ const MyAds = () => {
                 </thead>
                 <tbody>
                   {rooms.map((room) => (
-                    <tr key={room.id} className="border-b border-gray-200">
+                    <tr key={room.id} className="h-24 border-b border-gray-200">
                       <td className="px-4 py-2">
                         {room.coverImageUrl
                           ? <Image
                             src={room.coverImageUrl}
                             alt="Ad Cover"
                             title="Ad Cover"
+                            quality={50}
+                            layout='contain'
                             width={100}
-                            height={100}
+                            height={50}
                             className="rounded-lg"
                           />
                           : 'No images'}

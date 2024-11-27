@@ -36,9 +36,10 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, url, onRemoveCli
       <LoadingImage isLoading={isLoading} />
       <Image
         src={url}
-        layout="responsive"
-        width={4} // Aspect ratio
-        height={3}
+        layout="contain"
+        width={360} // Aspect ratio
+        height={100}
+        quality={75}
         objectFit="cover"
         onLoadStart={() => setIsLoading(true)}
         onLoad={() => setIsLoading(false)}
