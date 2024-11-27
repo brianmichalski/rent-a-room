@@ -14,6 +14,9 @@ export interface RoomResult {
   postalCode: string;
   city: string
   pictures: string[];
+  ownerName: string;
+  ownerCity: string;
+  ownerPhone: string;
 }
 
 export interface CityResult {

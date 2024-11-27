@@ -50,6 +50,14 @@ class RoomRouter {
     return await this.roomService.getFavoritesIdList(token.id);
   }
 
+  // GET /api/room/:id/details (get one)
+  @Get("/:id/details")
+  @HttpCode(200)
+  public async getDetails(
+    @Param("id") roomId: number): Promise<RoomResult> {
+    return await this.roomService.getDetails(Number(roomId));
+  }
+
   // GET /api/room/:id (get one)
   @Get("/:id")
   @HttpCode(200)
@@ -76,8 +84,7 @@ class RoomRouter {
   @Get()
   @HttpCode(200)
   public async getAllRooms(
-    @Query() searchParams: RoomSearch,
-    @GetToken() token: JWT
+    @Query() searchParams: RoomSearch
   ): Promise<RoomResult[]> {
     return await this.roomService.getAll(searchParams);
   }

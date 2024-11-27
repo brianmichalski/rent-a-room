@@ -34,7 +34,10 @@ export class RoomService {
       city: `${room.address?.city.name}, ${room.address?.city.province.abbreviation}`,
       // pictures
       pictures: room.roomPictures.map((p: RoomPicture) => p.url),
-    }
+      ownerName: room.owner?.firstName,
+      ownerCity: room.owner ? `${room.owner?.address?.city?.name}, ${room.owner.address?.city?.province?.abbreviation}` : '',
+      ownerPhone: room.owner?.phone,
+    } as RoomResult
   }
 
   public async getAll(params: RoomSearch) {
@@ -166,6 +169,48 @@ export class RoomService {
     });
 
     return result as Room;
+  }
+
+  public async getDetails(id: number): Promise<RoomResult> {
+    const result = await this.prisma.room.findUnique({
+      include: {
+        owner: {
+          include: {
+            address: {
+              include: {
+                city: {
+                  include: {
+                    province: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        address: {
+          include: {
+            city: {
+              include: {
+                province: true
+              }
+            }
+          }
+        },
+        roomPictures: {
+          select: {
+            url: true
+          },
+          orderBy: {
+            order: 'asc'
+          },
+        },
+      },
+      where: {
+        id: id
+      },
+    });
+
+    return this.mapRoomToResult(result);
   }
 
   public async getCoverPictureUrl(roomId: number) {

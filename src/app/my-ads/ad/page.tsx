@@ -30,7 +30,7 @@ const initialFormData = {
 
 const CreateRoomPage = () => {
   const searchParams = useSearchParams(); // Retrieve query parameters
-  const id = searchParams?.get('id'); // Get adId from query
+  const id = searchParams?.get('id');
   const isEditMode: boolean = !!id;
 
   // --- Hook calls ---

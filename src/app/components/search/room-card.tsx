@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/outline';
 import { RoomResult } from '../../../types/results';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface RoomCardProps {
   room: RoomResult;
@@ -19,15 +20,17 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, favoriteRooms, onToggleFavori
     <div className="bg-white p-4 rounded-lg shadow-md">
       <div className="relative">
         <div className="flex justify-center items-center">
-          <Image
-            src={room.pictures[currentImageIndex] || "/default-image.jpg"}
-            alt="Room"
-            className="w-full h-60 object-cover rounded-md"
-            layout='contain'
-            quality={75}
-            width={240}
-            height={100}
-          />
+          <Link href={`/room-details?id=${room.id}`} title='Go to room details'>
+            <Image
+              src={room.pictures[currentImageIndex] || "/default-image.jpg"}
+              alt="Room"
+              className="w-full h-60 object-cover rounded-md"
+              layout='contain'
+              quality={75}
+              width={240}
+              height={100}
+            />
+          </Link>
         </div>
         <div className="absolute bottom-0 left-0 w-full flex justify-center py-2 space-x-2">
           {room.pictures.map((_, index: number) => (
