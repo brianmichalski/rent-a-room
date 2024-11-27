@@ -3,7 +3,7 @@ type DebouncedFunction<T extends (...args: any[]) => void> = {
   cancel: () => void;
 };
 
-function debounce<T extends (...args: any[]) => void>(
+export function debounce<T extends (...args: any[]) => void>(
   func: T,
   wait: number,
   leading: boolean = false

@@ -1,7 +1,8 @@
 import { AdjustmentsHorizontalIcon, BarsArrowDownIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import React, { useMemo, useState } from 'react';
-import { CityResult } from "../../../types/results";
 import { SelectOption } from "../../../types/forms";
+import { CityResult } from "../../../types/results";
+import { debounce } from "../../../utils/ui";
 
 interface FilterAndSortProps {
   sortOptions: SelectOption[],
@@ -22,8 +23,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
     setCities(data);
   };
 
-  const debouncedFetchCities = useMemo(() => fetchCities, []);
-  //const debouncedFetchCities = useMemo(() => debounce(fetchCities, 350), []);
+  const debouncedFetchCities = useMemo(() => debounce(fetchCities, 500), []);
 
   const handleCityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -50,6 +50,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
           <input
             placeholder="Select a location..."
             value={citySearch}
+            onFocus={(e) => e.target.select()}
             onChange={handleCityChange}
             onBlur={() => {
               setTimeout(() => {
@@ -61,7 +62,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
           {showCityOptions
             ? <ul className="absolute top-9 left-8 w-full bg-white mt-2 max-h-48 overflow-auto border shadow-md rounded-md z-10">
               {cities?.map((city, idx) => (
-                <li onClick={() => { handleCitySelect(city) }}
+                <li onMouseDown={() => { handleCitySelect(city) }}
                   key={idx}
                   className="py-2 px-3 hover:bg-gray-200 cursor-pointer">
                   {`${city.name}, ${city.province}`}
