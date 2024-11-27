@@ -4,7 +4,7 @@ import RoomCard from "./room-card"; // Assuming Room type is defined
 
 interface SearchResultProps {
   results: RoomResult[];
-  favoriteRooms: Set<number>;
+  favoriteRooms: number[];
   onToggleFavorite: (id: number) => void;
 }
 

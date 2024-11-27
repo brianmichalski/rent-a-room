@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { StarIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, StarIcon } from '@heroicons/react/24/outline';
 import { RoomResult } from '../../../types/results';
 
 interface RoomCardProps {
   room: RoomResult;
-  favoriteRooms: Set<number>;
+  favoriteRooms: number[];
   onToggleFavorite: (id: number) => void;
 }
 
@@ -33,8 +33,10 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, favoriteRooms, onToggleFavori
             />
           ))}
         </div>
-        <StarIcon
-          className={`absolute top-2 right-2 h-6 w-6 cursor-pointer ${favoriteRooms.has(room.id) ? 'text-yellow-500' : 'text-gray-500'}`}
+        <HeartIcon
+          fill={favoriteRooms.includes(room.id) ? 'red' : 'white'}
+          fillOpacity={favoriteRooms.includes(room.id) ? '90%' : '80%'}
+          className={`absolute top-2 right-2 h-7 w-7 cursor-pointer ${favoriteRooms.includes(room.id) ? 'text-red-300' : 'text-gray-100'}`}
           onClick={() => onToggleFavorite(room.id)}
         />
       </div>

@@ -35,6 +35,14 @@ class RoomRouter {
     return await this.roomService.getAllByOwnerId(token.id);
   }
 
+  // GET /api/room/favorites (get user's favorite rooms)
+  @NextAuthGuard()
+  @Get('/favorites')
+  @HttpCode(200)
+  public async getFavorites(@GetToken() token: JWT): Promise<number[]> {
+    return await this.roomService.getFavorites(token.id);
+  }
+
   // GET /api/room/:id (get one)
   @Get("/:id")
   @HttpCode(200)
@@ -102,6 +110,29 @@ class RoomRouter {
 
     return await this.roomService.updateRoomAvailability(Number(roomId), token.id);
   }
+
+  // PUT /api/room/:id/favorite (update one)
+  @NextAuthGuard()
+  @Put('/:id/favorite')
+  @HttpCode(201)
+  public async addRoomToFavorites(
+    @Param("id") roomId: number,
+    @GetToken() token: JWT): Promise<void> {
+
+    await this.roomService.addRoomToFavorites(Number(roomId), token.id);
+  }
+
+  // PUT /api/room/:id/favorite (update one)
+  @NextAuthGuard()
+  @Put('/:id/unfavorite')
+  @HttpCode(201)
+  public async removeRoomFromFavorites(
+    @Param("id") roomId: number,
+    @GetToken() token: JWT): Promise<void> {
+
+    await this.roomService.deleteRoomFromFavorites(Number(roomId), token.id);
+  }
+
 
   // DELETE /api/room/:id (delete one)
   @NextAuthGuard()

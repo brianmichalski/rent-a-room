@@ -29,7 +29,8 @@ const Home: React.FC = () => {
   const [sort, setSort] = useState<string>(sortOptions[0].value);
   const [city, setCity] = useState<CityResult | undefined>();
   const [results, setResults] = useState<RoomResult[]>([]);
-  const [favoriteRooms, setFavoriteRooms] = useState<Set<number>>(new Set());
+  const [favoriteRooms, setFavoriteRooms] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch room data based on filters and sorting
   const fetchResults = async () => {
@@ -39,16 +40,38 @@ const Home: React.FC = () => {
     setResults(data);
   };
 
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch('/api/room/favorites');
+      if (!response.ok) {
+        throw new Error('Failed to fetch favorites');
+      }
+      const data = await response.json();
+      setFavoriteRooms(data);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
   useEffect(() => {
     fetchResults();
   }, [filter, sort, city]);
 
   const toggleFavorite = (roomId: number) => {
-    if (favoriteRooms.has(roomId)) {
-      setFavoriteRooms(new Set([...favoriteRooms].filter(id => id !== roomId)));
+    if (!favoriteRooms) {
+      return;
+    }
+    if (favoriteRooms?.includes(roomId)) {
+      setFavoriteRooms([...favoriteRooms].filter(id => id !== roomId));
       fetch(`/api/room/${roomId}/unfavorite`, { method: "PUT" });
     } else {
-      setFavoriteRooms(new Set(favoriteRooms.add(roomId)));
+      setFavoriteRooms([...favoriteRooms, roomId]);
       fetch(`/api/room/${roomId}/favorite`, { method: "PUT" });
     }
   };

@@ -34,7 +34,6 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
   };
 
   const handleCitySelect = (city: CityResult | undefined) => {
-    console.log(JSON.stringify(city));
     if (city) {
       setCitySearch(`${city.name}, ${city.province}`);
     }

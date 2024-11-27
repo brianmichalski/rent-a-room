@@ -1,11 +1,11 @@
 import { AddressType, Prisma, Room, RoomPicture } from "@prisma/client";
 import { BadRequestException, NotFoundException } from "next-api-decorators";
 import prisma from "../../../prisma/client";
+import { RoomResult } from "../../types/results";
 import { RoomInput } from "../dto/room/room.input";
 import { RoomSearch } from "../dto/room/room.search";
 import { RoomPictureInput } from "../dto/room/roomPicture.input";
 import { RoomPictureOrderInput } from "../dto/room/roomPictureOrder.input";
-import { RoomResult } from "../../types/results";
 
 export class RoomService {
   private prisma;
@@ -96,7 +96,7 @@ export class RoomService {
     if (params.sizeMax) {
       where.size = { lte: Number(params.sizeMax) };
     }
-    if (params.cityId) {
+    if (params.cityId && String(params.cityId) !== 'undefined') {
       where.address = {
         cityId: Number(params.cityId)
       };
@@ -187,6 +187,18 @@ export class RoomService {
     );
   }
 
+  public async getFavorites(userId: number) {
+    const favorites = await this.prisma.favorite.findMany({
+      where: {
+        userId: Number(userId)
+      },
+      orderBy: {
+        roomId: 'asc'
+      }
+    });
+    return favorites.map(f => f.roomId);
+  }
+
   public async createRoom(data: RoomInput): Promise<Room> {
 
     await this.checkOwnerPreconditions(data.ownerId);
@@ -231,6 +243,40 @@ export class RoomService {
       ownerId: ownerId
     } as Room;
     return await this.updateRoom(id, data);
+  }
+
+  public async addRoomToFavorites(roomId: number, userId: number): Promise<void> {
+    const room = await this.prisma.room.findFirst({
+      where: {
+        id: roomId
+      }
+    });
+    if (!room) {
+      return;
+    }
+    await this.prisma.favorite.create({
+      data: {
+        roomId: roomId,
+        userId: userId
+      }
+    });
+  }
+
+  public async deleteRoomFromFavorites(roomId: number, userId: number): Promise<void> {
+    const room = await this.prisma.room.findFirst({
+      where: {
+        id: roomId
+      }
+    });
+    if (!room) {
+      return;
+    }
+    await this.prisma.favorite.deleteMany({
+      where: {
+        roomId: roomId,
+        userId: userId
+      }
+    });
   }
 
   public async deleteRoom(roomId: number, ownerId: number): Promise<boolean> {

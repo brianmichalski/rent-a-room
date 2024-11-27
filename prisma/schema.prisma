@@ -64,6 +64,8 @@ model Room {
   isRented      Boolean       @default(false)
   createdAt     DateTime      @default(now())
   roomPictures  RoomPicture[]
+  favoriteId    Int?
+  Favorite      Favorite[]
 
   @@map("room")
 }
@@ -81,22 +83,34 @@ model RoomPicture {
 }
 
 model User {
-  id                  Int       @id @default(autoincrement())
-  addressId           Int?      @unique
-  address             Address?  @relation(fields: [addressId], references: [id])
-  firstName           String    @db.VarChar(100)
-  lastName            String    @db.VarChar(100)
-  email               String    @unique
-  password            String    @db.VarChar(128) // SHA512
-  phone               String?   @db.VarChar(20)
-  profilePictureUrl   String?   @db.VarChar(255)
-  isOwner             Boolean   @default(false)
+  id                  Int        @id @default(autoincrement())
+  addressId           Int?       @unique
+  address             Address?   @relation(fields: [addressId], references: [id])
+  firstName           String     @db.VarChar(100)
+  lastName            String     @db.VarChar(100)
+  email               String     @unique
+  password            String     @db.VarChar(128) // SHA512
+  phone               String?    @db.VarChar(20)
+  profilePictureUrl   String?    @db.VarChar(255)
+  isOwner             Boolean    @default(false)
   lastLoginAttempt    DateTime?
-  failedLoginAttempts Int       @default(0)
-  createdAt           DateTime  @default(now())
+  failedLoginAttempts Int        @default(0)
+  createdAt           DateTime   @default(now())
   rooms               Room[]
+  Favorite            Favorite[]
 
   @@map("user")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("favorite")
 }
 
 enum AddressType {

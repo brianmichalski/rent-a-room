@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/react";
-import { ArrowRightEndOnRectangleIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, DocumentTextIcon, HomeModernIcon, StarIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowRightEndOnRectangleIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, DocumentTextIcon, HeartIcon, HomeModernIcon, StarIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -7,7 +7,7 @@ const UserMenu: React.FC = () => {
   const products = [
     { name: 'My Ads', description: 'Manage your ads', href: '/my-ads', icon: HomeModernIcon },
     { name: 'Chats', description: 'Speak directly to your customers', href: '#', icon: ChatBubbleLeftRightIcon },
-    { name: 'Favorites', description: 'Handle your favorite ads', href: '#', icon: StarIcon },
+    { name: 'Favorites', description: 'Handle your favorite ads', href: '#', icon: HeartIcon },
     { name: 'My Account', description: 'Manage your data, password and more', href: '/my-account', icon: UserCircleIcon },
     { name: 'Platform Policy', description: 'Know our terms and conditions', href: '#', icon: DocumentTextIcon },
     { name: 'Sign out', description: 'End session', action: () => { signOut({ callbackUrl: "/" }); }, icon: ArrowRightEndOnRectangleIcon },
