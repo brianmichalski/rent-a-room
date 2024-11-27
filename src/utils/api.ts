@@ -33,8 +33,8 @@ export const parseFormWithFile = (
           let message = err.message;
           if (err.message.includes('maxFiles')) {
             message = `Limit of files exceeded. The maximum is ${maxFiles} simultaneous pictures.`
-          } else if (err.message.includes('maxFileSize')) {
-            message = `Payload size too large. The maximum accepted is ${maxFileSize} MB.`
+          } else if (err.message.includes('maxTotalFileSize')) {
+            message = `Payload is too large. The maximum accepted is ${maxFileSize} MB.`
           }
           reject(new HttpException(err.httpCode, message));
         } else {

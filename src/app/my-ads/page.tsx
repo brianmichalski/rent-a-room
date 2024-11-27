@@ -70,18 +70,19 @@ const MyAds = () => {
                   {rooms.map((room) => (
                     <tr key={room.id} className="h-24 border-b border-gray-200">
                       <td className="px-4 py-2">
-                        {room.coverImageUrl
-                          ? <Image
-                            src={room.coverImageUrl}
-                            alt="Ad Cover"
-                            title="Ad Cover"
-                            quality={50}
-                            layout='contain'
-                            width={100}
-                            height={50}
-                            className="rounded-lg"
-                          />
-                          : 'No images'}
+                        <Link title='Go to room details page' href={`/room-details?id=${room.id}`}>
+                          {room.coverImageUrl
+                            ? <Image
+                              src={room.coverImageUrl}
+                              alt="Ad Cover"
+                              quality={50}
+                              layout='contain'
+                              width={100}
+                              height={50}
+                              className="rounded-lg"
+                            />
+                            : 'No images'}
+                        </Link>
                       </td>
                       <td className="px-4 py-2">{room.roomType}</td>
                       <td className="px-4 py-2">{room.bathroomType}</td>
