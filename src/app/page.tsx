@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SelectOption } from "../types/forms";
 import { CityResult, RoomResult } from "../types/results";
 import FilterAndSort from "./components/search/filter-and-sort";
 import SearchResult from "./components/search/search-result";
-import { SelectOption } from "../types/forms";
 
 const Home: React.FC = () => {
   const sortOptions: SelectOption[] = [
@@ -25,17 +25,48 @@ const Home: React.FC = () => {
       value: 'size.desc'
     }
   ];
-  const [filter, setFilter] = useState<string>("");
-  const [sort, setSort] = useState<string>(sortOptions[0].value);
   const [city, setCity] = useState<CityResult | undefined>();
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
+  const [type, setType] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>(sortOptions[0].value);
   const [results, setResults] = useState<RoomResult[]>([]);
   const [favoriteRooms, setFavoriteRooms] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const prepareQueryParams = () => {
+    const queryParams = new URLSearchParams();
+    if (city) {
+      queryParams.append('cityId', String(city?.id));
+    }
+    if (priceRange[0]) {
+      queryParams.append('rentPriceMin', String(priceRange[0]));
+    }
+    if (priceRange[1]) {
+      queryParams.append('rentPriceMax', String(priceRange[1]));
+    }
+    if (type ?? '' !== '') {
+      queryParams.append('roomType', type);
+    }
+    if (gender ?? '' !== '') {
+      queryParams.append('gender', gender);
+    }
+    const sortParams = sortBy.split('.');
+    queryParams.append('sortBy', sortParams[0]);
+    queryParams.append('sortDir', sortParams[1]);
+    return queryParams.toString();
+  }
+
+  const resetFilter = () => {
+    setCity(undefined);
+    setPriceRange([0, 1000]);
+    setType("");
+    setGender("");
+  }
+
   // Fetch room data based on filters and sorting
   const fetchResults = async () => {
-    const sortParams = sort.split('.');
-    const res = await fetch(`/api/room/?cityId=${city?.id}&filter=${filter}&sortBy=${sortParams[0]}&sortDir=${sortParams[1]}`);
+    const res = await fetch(`/api/room?${prepareQueryParams()}`);
     const data = await res.json();
     setResults(data);
   };
@@ -61,7 +92,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchResults();
-  }, [filter, sort, city]);
+  }, [city, priceRange, type, gender, sortBy]);
 
   const toggleFavorite = (roomId: number) => {
     if (!favoriteRooms) {
@@ -79,9 +110,17 @@ const Home: React.FC = () => {
   return (
     <>
       <FilterAndSort
-        onFilter={setFilter}
-        onSort={setSort}
+        city={city}
+        priceRange={priceRange}
+        type={type}
+        gender={gender}
+        sortBy={sortBy}
         onCityChange={setCity}
+        onPriceChange={setPriceRange}
+        onTypeChange={setType}
+        onGenderChange={setGender}
+        onSortChange={setSortBy}
+        handleReset={resetFilter}
         sortOptions={sortOptions}
       />
       <SearchResult

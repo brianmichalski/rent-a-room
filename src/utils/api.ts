@@ -57,3 +57,13 @@ export const parseForm = (req: NextApiRequest): Promise<{ fields: Fields }> => {
     });
   });
 };
+
+export const clearEmptyParams = <T extends object>(object: T) => {
+  Object.keys(object).forEach(k => {
+    const value = object[k as keyof T];
+    if (['undefined', '', undefined].includes(value as unknown as any)) {
+      delete object[k as keyof T];
+    }
+  });
+  return object;
+}

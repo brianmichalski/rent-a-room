@@ -18,6 +18,7 @@ import { RoomSearch } from '../../../app/dto/room/room.search';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
 import { RoomResult } from '../../../types/results';
+import { clearEmptyParams } from '../../../utils/api';
 
 class RoomRouter {
   protected roomService: RoomService;
@@ -86,7 +87,7 @@ class RoomRouter {
   public async getAllRooms(
     @Query() searchParams: RoomSearch
   ): Promise<RoomResult[]> {
-    return await this.roomService.getAll(searchParams);
+    return await this.roomService.getAll(clearEmptyParams(searchParams));
   }
 
   // POST /api/room (create one)

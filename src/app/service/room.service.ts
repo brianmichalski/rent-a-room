@@ -83,27 +83,28 @@ export class RoomService {
     }
     // number of rooms
     if (params.numberOfRoomsMin) {
+      if (params.numberOfRoomsMax ?? 0 > 0) {
+        where.numberOfRooms = { gte: Number(params.numberOfRoomsMin ?? 0), lte: Number(params.numberOfRoomsMax) };
+      }
       where.numberOfRooms = { gte: Number(params.numberOfRoomsMin) };
     }
-    if (params.numberOfRoomsMax) {
-      where.numberOfRooms = { lte: Number(params.numberOfRoomsMax) };
-    }
     // rent price
-    if (params.rentPriceMin) {
-      where.rentPrice = { gte: Number(params.rentPriceMin) };
-    }
-    if (params.rentPriceMax) {
-      where.rentPrice = { lte: Number(params.rentPriceMax) };
+    if (params.rentPriceMin || params.rentPriceMax) {
+      if (params.rentPriceMax ?? 0 > 0) {
+        where.rentPrice = { gte: Number(params.rentPriceMin ?? 0), lte: Number(params.rentPriceMax) };
+      } else {
+        where.rentPrice = { gte: Number(params.rentPriceMin) };
+      }
     }
     if (params.roomType) {
       where.roomType = params.roomType;
     }
-    // rent price
-    if (params.sizeMin) {
-      where.size = { gte: Number(params.sizeMin) };
-    }
-    if (params.sizeMax) {
-      where.size = { lte: Number(params.sizeMax) };
+    // size
+    if (params.sizeMin || params.sizeMax) {
+      if (params.sizeMax ?? 0 > 0) {
+        where.size = { gte: Number(params.sizeMin), lte: Number(params.sizeMax) };
+      }
+      where.size = { gte: Number(params.sizeMin ?? 0) };
     }
     if (params.cityId && String(params.cityId) !== 'undefined') {
       where.address = {
