@@ -90,7 +90,7 @@ const MyAds = () => {
                       <td className="px-4 py-2 hidden sm:table-cell">
                         <span
                           className={`px-2 py-1 text-sm font-semibold rounded-lg
-                          ${room.isRented ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                          ${room.isRented ? 'bg-gray-500 text-white' : 'bg-green-500 text-white'}`}>
                           {room.isRented ? 'Rented' : 'Available'}
                         </span>
                       </td>

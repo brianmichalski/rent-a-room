@@ -69,10 +69,10 @@ const Home: React.FC = () => {
     }
     if (favoriteRooms?.includes(roomId)) {
       setFavoriteRooms([...favoriteRooms].filter(id => id !== roomId));
-      fetch(`/api/room/${roomId}/unfavorite`, { method: "PUT" });
+      fetch(`/api/room/${roomId}/favorite`, { method: "DELETE" });
     } else {
       setFavoriteRooms([...favoriteRooms, roomId]);
-      fetch(`/api/room/${roomId}/favorite`, { method: "PUT" });
+      fetch(`/api/room/${roomId}/favorite`, { method: "POST" });
     }
   };
 

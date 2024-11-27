@@ -7,7 +7,7 @@ const UserMenu: React.FC = () => {
   const products = [
     { name: 'My Ads', description: 'Manage your ads', href: '/my-ads', icon: HomeModernIcon },
     { name: 'Chats', description: 'Speak directly to your customers', href: '#', icon: ChatBubbleLeftRightIcon },
-    { name: 'Favorites', description: 'Handle your favorite ads', href: '#', icon: HeartIcon },
+    { name: 'Favorites', description: 'Handle your favorite ads', href: '/favorites', icon: HeartIcon },
     { name: 'My Account', description: 'Manage your data, password and more', href: '/my-account', icon: UserCircleIcon },
     { name: 'Platform Policy', description: 'Know our terms and conditions', href: '#', icon: DocumentTextIcon },
     { name: 'Sign out', description: 'End session', action: () => { signOut({ callbackUrl: "/" }); }, icon: ArrowRightEndOnRectangleIcon },

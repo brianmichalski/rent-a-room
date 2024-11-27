@@ -14,6 +14,29 @@ export class RoomService {
     this.prisma = _prisma;
   }
 
+  private mapRoomToResult(room: any) {
+    return {
+      id: room.id,
+      // room info
+      bathroomType: room.bathroomType,
+      description: room.description,
+      gender: room.gender,
+      isRented: room.isRented,
+      numberOfRooms: room.numberOfRooms,
+      number: room.address?.number,
+      rentPrice: room.rentPrice,
+      roomType: room.roomType,
+      // address
+      size: room.size,
+      street: room.address?.street,
+      postalCode: room.address?.postalCode,
+      other: room.address?.other,
+      city: `${room.address?.city.name}, ${room.address?.city.province.abbreviation}`,
+      // pictures
+      pictures: room.roomPictures.map((p: RoomPicture) => p.url),
+    }
+  }
+
   public async getAll(params: RoomSearch) {
     const [where, orderBy] = this.parseRoomSearchParams(params);
     const rooms = await this.prisma.room.findMany({
@@ -39,26 +62,7 @@ export class RoomService {
       where: where,
       orderBy: orderBy
     });
-    return rooms.map(room => ({
-      id: room.id,
-      // room info
-      bathroomType: room.bathroomType,
-      description: room.description,
-      gender: room.gender,
-      isRented: room.isRented,
-      numberOfRooms: room.numberOfRooms,
-      number: room.address?.number,
-      rentPrice: room.rentPrice,
-      roomType: room.roomType,
-      // address
-      size: room.size,
-      street: room.address?.street,
-      postalCode: room.address?.postalCode,
-      other: room.address?.other,
-      city: `${room.address?.city.name}, ${room.address?.city.province.abbreviation}`,
-      // pictures
-      pictures: room.roomPictures.map(p => p.url),
-    }) as RoomResult);
+    return rooms.map(room => (this.mapRoomToResult(room)) as RoomResult);
   }
 
   private parseRoomSearchParams(params: RoomSearch): [Prisma.RoomWhereInput, Prisma.RoomOrderByWithRelationInput] {
@@ -187,7 +191,7 @@ export class RoomService {
     );
   }
 
-  public async getFavorites(userId: number) {
+  public async getFavoritesIdList(userId: number) {
     const favorites = await this.prisma.favorite.findMany({
       where: {
         userId: Number(userId)
@@ -197,6 +201,34 @@ export class RoomService {
       }
     });
     return favorites.map(f => f.roomId);
+  }
+
+  public async getFavorites(userId: number) {
+    const favorites = await this.prisma.favorite.findMany({
+      include: {
+        room: {
+          include: {
+            address: {
+              include: {
+                city: {
+                  include: {
+                    province: true
+                  }
+                }
+              }
+            },
+            roomPictures: true
+          }
+        }
+      },
+      where: {
+        userId: Number(userId)
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    return favorites.map(f => (this.mapRoomToResult(f.room)) as RoomResult);
   }
 
   public async createRoom(data: RoomInput): Promise<Room> {

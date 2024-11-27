@@ -18,7 +18,6 @@ import { RoomSearch } from '../../../app/dto/room/room.search';
 import { RoomService } from '../../../app/service/room.service';
 import { GetToken, NextAuthGuard } from '../../../decorators';
 import { RoomResult } from '../../../types/results';
-import { plainToClass } from 'class-transformer';
 
 class RoomRouter {
   protected roomService: RoomService;
@@ -37,10 +36,18 @@ class RoomRouter {
 
   // GET /api/room/favorites (get user's favorite rooms)
   @NextAuthGuard()
+  @Get('/my-favorites')
+  @HttpCode(200)
+  public async getFavorites(@GetToken() token: JWT): Promise<RoomResult[]> {
+    return await this.roomService.getFavorites(token.id);
+  }
+
+  // GET /api/room/favorites (get user's favorite rooms' ids)
+  @NextAuthGuard()
   @Get('/favorites')
   @HttpCode(200)
-  public async getFavorites(@GetToken() token: JWT): Promise<number[]> {
-    return await this.roomService.getFavorites(token.id);
+  public async getFavoritesIdList(@GetToken() token: JWT): Promise<number[]> {
+    return await this.roomService.getFavoritesIdList(token.id);
   }
 
   // GET /api/room/:id (get one)
@@ -113,7 +120,7 @@ class RoomRouter {
 
   // PUT /api/room/:id/favorite (update one)
   @NextAuthGuard()
-  @Put('/:id/favorite')
+  @Post('/:id/favorite')
   @HttpCode(201)
   public async addRoomToFavorites(
     @Param("id") roomId: number,
@@ -124,7 +131,7 @@ class RoomRouter {
 
   // PUT /api/room/:id/favorite (update one)
   @NextAuthGuard()
-  @Put('/:id/unfavorite')
+  @Delete('/:id/favorite')
   @HttpCode(201)
   public async removeRoomFromFavorites(
     @Param("id") roomId: number,
