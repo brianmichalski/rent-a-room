@@ -97,13 +97,13 @@ export default function RoomDetails() {
           {/* Navigation Arrows */}
           <button
             onClick={() => handleImageNavigation('prev')}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow hover:bg-gray-100 hover:opacity-20"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
           >
             <ChevronLeftIcon className="h-12 w-12 text-gray-600" />
           </button>
           <button
             onClick={() => handleImageNavigation('next')}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow hover:bg-gray-100 hover:opacity-20"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
           >
             <ChevronRightIcon className="h-12 w-12 text-gray-600" />
           </button>

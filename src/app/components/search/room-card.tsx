@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HeartIcon, StarIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, StarIcon } from '@heroicons/react/24/outline';
 import { RoomResult } from '../../../types/results';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,9 +12,19 @@ interface RoomCardProps {
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, favoriteRooms, onToggleFavorite }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const totalImages = room.pictures.length;
 
   const handleImageChange = (index: number) => setCurrentImageIndex(index);
+
+  const handleImageNavigation = (direction: string) => {
+    if (!room?.pictures?.length) return;
+    const lastIndex = room.pictures.length - 1;
+    setCurrentImageIndex((prevIndex) =>
+      direction === 'prev'
+        ? (prevIndex === 0 ? lastIndex : prevIndex - 1)
+        : (prevIndex === lastIndex ? 0 : prevIndex + 1)
+    );
+  };
+
   const isFavorite = favoriteRooms.includes(room.id);
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
@@ -31,6 +41,19 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, favoriteRooms, onToggleFavori
               height={100}
             />
           </Link>
+          {/* Navigation Arrows */}
+          <button
+            onClick={() => handleImageNavigation('prev')}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
+          >
+            <ChevronLeftIcon className="h-6 w-6 text-gray-600" />
+          </button>
+          <button
+            onClick={() => handleImageNavigation('next')}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black "
+          >
+            <ChevronRightIcon className="h-6 w-6 text-gray-600" />
+          </button>
         </div>
         <div className="absolute bottom-0 left-0 w-full flex justify-center py-2 space-x-2">
           {room.pictures.map((_, index: number) => (
