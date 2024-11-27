@@ -264,7 +264,11 @@ export class RoomService {
                 }
               }
             },
-            roomPictures: true
+            roomPictures: {
+              orderBy: {
+                order: 'asc'
+              }
+            }
           }
         }
       },
