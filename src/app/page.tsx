@@ -7,11 +7,6 @@ import SearchResult from "./components/search/search-result";
 import { SelectOption } from "../types/forms";
 
 const Home: React.FC = () => {
-  const [filter, setFilter] = useState<string>("");
-  const [sort, setSort] = useState<string>("asc");
-  const [city, setCity] = useState<CityResult | undefined>();
-  const [results, setResults] = useState<RoomResult[]>([]);
-  const [favoriteRooms, setFavoriteRooms] = useState<Set<number>>(new Set());
   const sortOptions: SelectOption[] = [
     {
       description: 'Price: Low to High',
@@ -26,10 +21,15 @@ const Home: React.FC = () => {
       value: 'size.asc'
     },
     {
-      description: 'Size: Bigger firs',
+      description: 'Size: Bigger first',
       value: 'size.desc'
     }
   ];
+  const [filter, setFilter] = useState<string>("");
+  const [sort, setSort] = useState<string>(sortOptions[0].value);
+  const [city, setCity] = useState<CityResult | undefined>();
+  const [results, setResults] = useState<RoomResult[]>([]);
+  const [favoriteRooms, setFavoriteRooms] = useState<Set<number>>(new Set());
 
   // Fetch room data based on filters and sorting
   const fetchResults = async () => {

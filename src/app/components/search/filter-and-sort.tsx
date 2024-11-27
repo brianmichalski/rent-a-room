@@ -85,7 +85,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({ onFilter, onSort, onCityC
           className="bg-gray-200 py-2 pl-4 rounded w-fit"
         >
           {sortOptions.map(option =>
-            <option value={option.value}>{option.description}</option>
+            <option key={option.value} value={option.value}>{option.description}</option>
           )}
         </select>
       </div>
