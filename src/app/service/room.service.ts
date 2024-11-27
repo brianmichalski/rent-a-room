@@ -370,6 +370,12 @@ export class RoomService {
   }
 
   public async createRoomPicture(data: RoomPictureInput): Promise<boolean> {
+    const maxPictures = Number(process.env.MAX_PICTURES_PER_AD);
+    const countPictures = await this.prisma.roomPicture.count({ where: { roomId: data.roomId } });
+    if ((countPictures + (data.urls?.length ?? 0)) > maxPictures) {
+      throw new BadRequestException(`The maximum limit is ${maxPictures} pictures per advertisement`);
+    }
+
     const lastPicture = await this.prisma.roomPicture.findFirst({
       take: 1,
       select: {
