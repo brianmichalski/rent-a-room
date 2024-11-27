@@ -39,6 +39,8 @@ export class RoomService {
 
   public async getAll(params: RoomSearch) {
     const [where, orderBy] = this.parseRoomSearchParams(params);
+    // excludes the rented rooms
+    where.isRented = false;
     const rooms = await this.prisma.room.findMany({
       include: {
         address: {
