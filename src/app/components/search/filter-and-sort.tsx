@@ -2,25 +2,19 @@ import { Button } from "@headlessui/react";
 import Slider from "rc-slider";
 import 'rc-slider/assets/index.css';
 import React, { useState } from "react";
-import { SelectOption } from "../../../types/forms";
 import { CityResult } from "../../../types/results";
+import { GenderDescriptions, RoomTypeDescriptions } from "../../helper/enum.helper";
 import Dropdown from "../input/dropdown/dropdown";
 import CityFilter from "./city-filter";
 
-interface FilterAndSortProps {
-  sortOptions: SelectOption[];
-}
+export const DEFAULT_SORT = 'price.asc';
 
-const typeOptions: SelectOption[] = [
-  { description: "Individual", value: "I" },
-  { description: "Shared", value: "S" },
-];
-
-const genderOptions: SelectOption[] = [
-  { description: "Any", value: "X" },
-  { description: "Female", value: "F" },
-  { description: "Male", value: "M" },
-];
+const sortOptions: Record<string, string> = {
+  DEFAULT_SORT: 'Price - low to high',
+  'price.desc': 'Price - high to low',
+  'size.asc': 'Size - smaller first',
+  'size.desc': 'Size - bigger first'
+};
 
 interface FilterAndSortProps {
   city: CityResult | undefined;
@@ -34,7 +28,6 @@ interface FilterAndSortProps {
   onGenderChange: (gender: string) => void;
   onSortChange: (sortBy: string) => void;
   handleReset: () => void;
-  sortOptions: SelectOption[];
 }
 
 const FilterAndSort: React.FC<FilterAndSortProps> = ({
@@ -48,8 +41,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({
   onTypeChange,
   onGenderChange,
   onSortChange,
-  handleReset,
-  sortOptions,
+  handleReset
 }) => {
   const [citySearch, setCitySearch] = useState<string>("");
   const [minPrice, maxPrice] = [0, 1000];
@@ -78,8 +70,8 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({
       </div>
 
       {/* Price Range Slider */}
-      <div className="flex flex-col flex-grow px-2">
-        <label className="mr-2">Price Range:</label>
+      <div className="flex flex-col flex-grow px-2 gap-y-1">
+        <label className="mr-2">Price Range</label>
         <div className="w-full max-w-lg mx-auto space-y-4">
           <Slider
             range
@@ -116,7 +108,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({
           label="Room Type"
           value={type}
           onChange={onTypeChange}
-          options={typeOptions}
+          options={RoomTypeDescriptions}
         />
       </div>
 
@@ -126,7 +118,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({
           label="Gender"
           value={gender}
           onChange={onGenderChange}
-          options={genderOptions}
+          options={GenderDescriptions}
         />
       </div>
 
@@ -137,6 +129,7 @@ const FilterAndSort: React.FC<FilterAndSortProps> = ({
           value={sortBy}
           onChange={onSortChange}
           options={sortOptions}
+          emptyOption={false}
         />
       </div>
 

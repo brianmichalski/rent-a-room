@@ -7,6 +7,7 @@ export const useFetchUserData = (
 ) => {
   const fetchUserData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch('/api/user/property-owner');
       if (!response.ok) throw new Error('Failed to fetch user data');
       const data = await response.json();

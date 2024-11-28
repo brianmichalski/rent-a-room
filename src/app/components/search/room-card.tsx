@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, StarIcon } from '@heroicons/react/24/outline';
-import { RoomResult } from '../../../types/results';
+import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
+import React, { useState } from 'react';
+import { RoomResult } from '../../../types/results';
+import { getBathroomTypeDescription, getGenderDescription, getRoomTypeDescription } from '../../helper/enum.helper';
 
 interface RoomCardProps {
   room: RoomResult;
@@ -73,9 +74,29 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, favoriteRooms, onToggleFavori
           onClick={() => onToggleFavorite(room.id)}
         />
       </div>
-      <h3 className="mt-2 text-xl font-semibold">{`${room.number} ${room.street}`}</h3>
-      <p className="text-sm text-gray-500">{room.size} m²</p>
-      <p className="text-lg font-semibold mt-2">${room.rentPrice}</p>
+      <div className='flex justify-between'>
+        <div className="flex flex-col p-2">
+          <h4 className="text-xl font-semibold">{`${room.address}`}</h4>
+          <p className="text-sm text-gray-500">{room.city}</p>
+        </div>
+        <div className="flex flex-col items-end p-2">
+          <p className="text-md font-semibold">${room.rentPrice}/month</p>
+          <p className="text-sm">{room.size} m²</p>
+        </div>
+      </div>
+      <div className='grid grid-cols-3 border-t pt-1'>
+        <p className="text-sm text-center">
+          <span className='block text-xs text-gray-500'>Type</span>
+          {getRoomTypeDescription(room.roomType)}</p>
+        <p className="text-sm text-center">
+          <span className='block text-xs text-gray-500'>Bathroom</span>
+          {getBathroomTypeDescription(room.bathroomType)}
+        </p>
+        <p className="text-center">
+          <span className='block text-xs text-gray-500'>Gender</span>
+          {getGenderDescription(room.gender)}
+        </p>
+      </div>
     </div>
   );
 };

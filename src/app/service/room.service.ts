@@ -28,7 +28,7 @@ export class RoomService {
       roomType: room.roomType,
       // address
       size: room.size,
-      street: room.address?.street,
+      address: `${room.address?.number}, ${room.address?.street}`,
       postalCode: room.address?.postalCode,
       other: room.address?.other,
       city: `${room.address?.city.name}, ${room.address?.city.province.abbreviation}`,
@@ -126,7 +126,7 @@ export class RoomService {
   }
 
   public async getAllByOwnerId(ownerId: number) {
-    return await this.prisma.room.findMany({
+    const result = await this.prisma.room.findMany({
       include: {
         owner: true,
         address: {
@@ -137,7 +137,15 @@ export class RoomService {
               }
             }
           }
-        }
+        },
+        roomPictures: {
+          select: {
+            url: true
+          },
+          orderBy: {
+            order: 'asc'
+          },
+        },
       },
       where: {
         owner: {
@@ -148,6 +156,7 @@ export class RoomService {
         createdAt: "desc"
       }
     });
+    return result?.map(room => this.mapRoomToResult(room));
   }
 
   public async getById(id: number): Promise<Room> {

@@ -31,7 +31,7 @@ class RoomRouter {
   @NextAuthGuard()
   @Get('/my-rooms')
   @HttpCode(200)
-  public async getAll(@GetToken() token: JWT): Promise<Room[]> {
+  public async getAll(@GetToken() token: JWT): Promise<RoomResult[]> {
     return await this.roomService.getAllByOwnerId(token.id);
   }
 

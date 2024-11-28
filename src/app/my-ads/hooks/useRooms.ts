@@ -1,6 +1,7 @@
 import { Room } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { RoomWithCover } from '../types';
+import { RoomResult } from '../../../types/results';
 
 export const useRooms = () => {
   const [rooms, setRooms] = useState<RoomWithCover[]>([]);
@@ -13,7 +14,7 @@ export const useRooms = () => {
       const roomsData = await roomsResponse.json();
 
       const roomsWithCover = await Promise.all(
-        roomsData.map(async (room: Room) => {
+        roomsData.map(async (room: RoomResult) => {
           const coverResponse = await fetch(`/api/room/${room.id}/cover`);
           const coverImageUrl = await coverResponse.text();
           return { ...room, coverImageUrl };

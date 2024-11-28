@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Breadcrumb from '../components/layout/breadcrumb';
 import CustomDialog from '../components/layout/modal';
+import { getBathroomTypeDescription, getGenderDescription, getRoomTypeDescription } from '../helper/enum.helper';
 import { useChangeRoomAvailability } from './hooks/useChangeRoomAvailability';
 import { useDeleteRoom } from './hooks/useDeleteRoom';
 import { useRooms } from './hooks/useRooms';
@@ -56,13 +57,12 @@ const MyAds = () => {
                 <thead>
                   <tr className="bg-gray-100 text-left text-gray-700">
                     <th className="px-4 py-2">Cover</th>
-                    <th className="px-4 py-2">Room Type</th>
-                    <th className="px-4 py-2">Bathroom Type</th>
-                    <th className="px-4 py-2">Gender</th>
+                    <th className="px-4 py-2 hidden sm:table-cell">Status</th>
+                    <th className="px-4 py-2">Address</th>
                     <th className="px-4 py-2">Rent Price</th>
-                    <th className="px-4 py-2">Size (m²)</th>
-                    <th className="px-4 py-2">Number of Rooms</th>
-                    <th className="px-4 py-2 hidden sm:table-cell">Status</th> {/* Hidden on small screens */}
+                    <th className="px-4 py-2 hidden sm:table-cell">Size (m²)</th>
+                    <th className="px-4 py-2 hidden sm:table-cell">Number of Rooms</th>
+                    <th className="px-4 py-2 hidden sm:table-cell">Other</th>
                     <th className="px-4 py-2">Actions</th>
                   </tr>
                 </thead>
@@ -84,18 +84,23 @@ const MyAds = () => {
                             : 'No images'}
                         </Link>
                       </td>
-                      <td className="px-4 py-2">{room.roomType}</td>
-                      <td className="px-4 py-2">{room.bathroomType}</td>
-                      <td className="px-4 py-2">{room.gender}</td>
-                      <td className="px-4 py-2">{room.rentPrice.toFixed(2)} CAD</td>
-                      <td className="px-4 py-2">{room.size}</td>
-                      <td className="px-4 py-2">{room.numberOfRooms}</td>
                       <td className="px-4 py-2 hidden sm:table-cell">
                         <span
                           className={`px-2 py-1 text-sm font-semibold rounded-lg
                           ${room.isRented ? 'bg-gray-500 text-white' : 'bg-green-500 text-white'}`}>
                           {room.isRented ? 'Rented' : 'Available'}
                         </span>
+                      </td>
+                      <td className="px-4 py-2">{room.address}</td>
+                      <td className="px-4 py-2">{room.rentPrice.toFixed(2)} CAD</td>
+                      <td className="px-4 py-2 hidden sm:table-cell text-center">{room.size}</td>
+                      <td className="px-4 py-2 hidden sm:table-cell text-center">{room.numberOfRooms}</td>
+                      <td className="px-4 py-2 border-b text-sm hidden sm:table-cell">
+                        <div className="grid grid-cols-2">
+                          <span>Type:</span><span>{getRoomTypeDescription(room.roomType)}</span>
+                          <span>Bathroom:</span><span>{getBathroomTypeDescription(room.bathroomType)}</span>
+                          <span>Gender:</span><span>{getGenderDescription(room.gender)}</span>
+                        </div>
                       </td>
                       <td className="px-4 py-2">
                         <div className='flex'>

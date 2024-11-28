@@ -1,15 +1,16 @@
+import { BathroomType, Gender, RoomType } from "@prisma/client";
+
 export interface RoomResult {
   id: number;
-  roomType: string;
-  bathroomType: string;
-  gender: string;
+  roomType: RoomType;
+  bathroomType: BathroomType;
+  gender: Gender;
   description: string;
   rentPrice: number;
   size: number;
   numberOfRooms: number;
   isRented: boolean;
-  street: string;
-  number: number;
+  address: string;
   other: string;
   postalCode: string;
   city: string

@@ -1,35 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SelectOption } from "../types/forms";
 import { CityResult, RoomResult } from "../types/results";
-import FilterAndSort from "./components/search/filter-and-sort";
+import FilterAndSort, { DEFAULT_SORT } from "./components/search/filter-and-sort";
 import SearchResult from "./components/search/search-result";
 
 const Home: React.FC = () => {
-  const sortOptions: SelectOption[] = [
-    {
-      description: 'Price - low to high',
-      value: 'price.asc'
-    },
-    {
-      description: 'Price - high to low',
-      value: 'price.desc'
-    },
-    {
-      description: 'Size - smaller first',
-      value: 'size.asc'
-    },
-    {
-      description: 'Size - bigger first',
-      value: 'size.desc'
-    }
-  ];
+
   const [city, setCity] = useState<CityResult | undefined>();
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
   const [type, setType] = useState<string>("");
   const [gender, setGender] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>(sortOptions[0].value);
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT);
   const [results, setResults] = useState<RoomResult[]>([]);
   const [favoriteRooms, setFavoriteRooms] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +33,7 @@ const Home: React.FC = () => {
     if (gender ?? '' !== '') {
       queryParams.append('gender', gender);
     }
-    const sortParams = sortBy.split('.');
+    const sortParams = sortBy?.split('.');
     queryParams.append('sortBy', sortParams[0]);
     queryParams.append('sortDir', sortParams[1]);
     return queryParams.toString();
@@ -121,7 +103,6 @@ const Home: React.FC = () => {
         onGenderChange={setGender}
         onSortChange={setSortBy}
         handleReset={resetFilter}
-        sortOptions={sortOptions}
       />
       <SearchResult
         results={results}

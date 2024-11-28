@@ -6,6 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RoomResult } from '../../types/results';
 import Breadcrumb from '../components/layout/breadcrumb';
+import { getBathroomTypeDescription, getRoomTypeDescription } from '../helper/enum.helper';
+import RoomDetail from './components/room-detail';
 
 export default function RoomDetails() {
   const searchParams = useSearchParams(); // Retrieve query parameters
@@ -88,7 +90,7 @@ export default function RoomDetails() {
             fillOpacity={isFavorite ? '90%' : '80%'}
             className={`h-6 w-6 ${isFavorite ? 'text-red-500' : 'text-gray-300'}`} />
         </span>
-        <h2 className="text-xl font-bold mb-2">{room.number}, {room.street}</h2>
+        <h2 className="text-xl font-bold mb-2">{room.address}</h2>
       </div>
       <div className='flex gap-x-4'>
         {/* Pictures Gallery */}
@@ -192,27 +194,13 @@ export default function RoomDetails() {
             </li>
           </ul>
         </div>
-        <div className="w-full bg-white shadow rounded-lg p-6 relative grid grid-cols-3">
-          <ul className="block text-center">
-            <li>
-              <strong>Rent Price</strong>
-            </li>
-            <li>${room.rentPrice}/month</li>
-          </ul>
-          <ul className="block text-center">
-            <li>
-              <strong>Size</strong>
-            </li>
-            <li>{room.size} m²</li>
-          </ul>
-          <ul className="block text-center">
-            <li>
-              <strong>Availability</strong>
-            </li>
-            <li>
-              {room.isRented ? 'Rented' : 'Available'}
-            </li>
-          </ul>
+        <div className="w-full bg-white shadow rounded-lg p-6 grid grid-cols-3 gap-y-4">
+          <RoomDetail attribute='Rent Price' value={room.rentPrice} prefix='$' suffix='/month' />
+          <RoomDetail attribute='Size' value={room.size} suffix='m²' />
+          <RoomDetail attribute='Status' value={room.isRented ? 'Rented' : 'Available'} />
+          <RoomDetail attribute='Type' value={getRoomTypeDescription(room.roomType)} />
+          <RoomDetail attribute='Bathroom' value={getBathroomTypeDescription(room.bathroomType)} />
+          <RoomDetail attribute='Number os Rooms' value={room.numberOfRooms} />
         </div>
       </div>
 
