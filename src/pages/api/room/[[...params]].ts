@@ -55,8 +55,9 @@ class RoomRouter {
   @Get("/:id/details")
   @HttpCode(200)
   public async getDetails(
-    @Param("id") roomId: number): Promise<RoomResult> {
-    return await this.roomService.getDetails(Number(roomId));
+    @Param("id") roomId: number,
+    @GetToken() token: JWT): Promise<RoomResult> {
+    return await this.roomService.getDetails(Number(roomId), token.id);
   }
 
   // GET /api/room/:id (get one)

@@ -172,8 +172,8 @@ export class RoomService {
     return result as Room;
   }
 
-  public async getDetails(id: number): Promise<RoomResult> {
-    const result = await this.prisma.room.findUnique({
+  public async getDetails(roomId: number, userId: number): Promise<RoomResult> {
+    const room = await this.prisma.room.findUnique({
       include: {
         owner: {
           include: {
@@ -207,11 +207,19 @@ export class RoomService {
         },
       },
       where: {
-        id: id
+        id: roomId
       },
     });
 
-    return this.mapRoomToResult(result);
+    const result = this.mapRoomToResult(room);
+    const isUserFavorite = null != (await this.prisma.favorite.findFirst({
+      where: {
+        roomId: roomId,
+        userId: userId
+      }
+    }));
+    result.isFavorite = isUserFavorite;
+    return result;
   }
 
   public async getCoverPictureUrl(roomId: number) {

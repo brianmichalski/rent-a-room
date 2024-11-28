@@ -55,6 +55,8 @@ export default function RoomDetails() {
     }
   };
 
+  const handleImageChange = (index: number) => setCurrentImageIndex(index);
+
   const handleImageNavigation = (direction: string) => {
     if (!room?.pictures?.length) return;
     const lastIndex = room.pictures.length - 1;
@@ -73,97 +75,90 @@ export default function RoomDetails() {
 
   return (
     <div className="container mx-auto p-4">
-      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: `/room-details?id=${room.id}`, label: 'Room Details' } ]} />
+      <Breadcrumb breadcrumbs={[{ href: '/', label: '' }, { href: `/room-details?id=${room.id}`, label: 'Room Details' }]} />
       <div className='flex gap-x-2 items-center mb-6'>
         <h1 className="text-3xl font-semibold mb-2">Room Details</h1>#{room.id}
       </div>
-      {/* Pictures Gallery */}
-      <div className="relative flex">
-        {/* Main Image */}
-        <div className="flex justify-center max-h-1/4 overflow-hidden bg-gray-200 w-full md:w-3/4 rounded-lg relative">
-          {room.pictures?.length > 0 ? (
-            <Image
-              src={room.pictures[currentImageIndex]}
-              alt={`Image ${currentImageIndex + 1}`}
-              layout='contain'
-              width={800}
-              height={600}
-              quality={100}
-              className="object-cover rounded-lg w-full"
-            />
-          ) : (
-            <p>No images available</p>
-          )}
-          {/* Navigation Arrows */}
-          <button
-            onClick={() => handleImageNavigation('prev')}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
-          >
-            <ChevronLeftIcon className="h-12 w-12 text-gray-600" />
-          </button>
-          <button
-            onClick={() => handleImageNavigation('next')}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
-          >
-            <ChevronRightIcon className="h-12 w-12 text-gray-600" />
-          </button>
-        </div>
-
-        {/* Thumbnails */}
-        <div className="hidden md:flex flex-col items-center ml-4 space-y-2 w-1/4">
-          {room.pictures?.map((thumbnail, index) => (
-            <button
-              key={index}
-              onClick={() => handleThumbnailClick(index)}
-              className={`w-38 h-42 overflow-hidden rounded-lg border-none ${index === currentImageIndex ? 'opacity-80' : 'border-gray-300'
-                }`}
-            >
-              <Image
-                src={thumbnail}
-                alt={`Thumbnail #${index + 1}`}
-                width={240}
-                height={140}
-                quality={75}
-                layout='contain'
-                className='shadow-md shadow-gray-400 rounded-lg '
-              />
-            </button>
-          ))}
-        </div>
+      <div className='flex w-full gap-x-2'>
+        <span className=" text-red-500 cursor-pointer"
+          onClick={toggleFavorite}>
+          <HeartIcon
+            title={isFavorite ? 'Unfavorite' : 'Favorite'}
+            fill={isFavorite ? 'red' : 'white'}
+            fillOpacity={isFavorite ? '90%' : '80%'}
+            className={`h-6 w-6 ${isFavorite ? 'text-red-500' : 'text-gray-300'}`} />
+        </span>
+        <h2 className="text-xl font-bold mb-2">{room.number}, {room.street}</h2>
       </div>
-
-      {/* Room Details and Owner Section */}
-      <div className="flex flex-wrap mt-6">
-        {/* Room Details */}
-        <div className="w-full md:w-2/3 bg-white shadow rounded-lg p-4 relative">
-          <h2 className="text-xl font-bold mb-2">{room.roomType}</h2>
-          <div
-            className="absolute top-4 right-4 text-red-500 cursor-pointer"
-            onClick={toggleFavorite}
-          >
-            <HeartIcon className={`h-6 w-6 ${isFavorite ? 'text-red-500' : 'text-gray-300'}`} />
+      <div className='flex gap-x-4'>
+        {/* Pictures Gallery */}
+        <div className="relative flex flex-grow max-h-96">
+          <div className="relative flex flex-grow">
+            {/* Main Image */}
+            <div className="flex justify-center flex-grow w-full md:w-3/4 max-h-96 rounded-lg relative overflow-hidden bg-gray-200">
+              {room.pictures?.length > 0 ? (
+                <Image
+                  src={room.pictures[currentImageIndex]}
+                  alt={`Image ${currentImageIndex + 1}`}
+                  layout='contain'
+                  width={600}
+                  height={400}
+                  quality={100}
+                  className="object-cover rounded-lg w-full"
+                />
+              ) : (
+                <p>No images available</p>
+              )}
+              {/* Navigation Arrows */}
+              <button
+                onClick={() => handleImageNavigation('prev')}
+                className="absolute left-0 sm:left-0 md:left-2 lg:left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
+              >
+                <ChevronLeftIcon className="h-12 w-12 text-gray-600" />
+              </button>
+              <button
+                onClick={() => handleImageNavigation('next')}
+                className="absolute right-0 sm:right-0 md:right-2 lg:right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full opacity-70 hover:opacity-100 hover:shadow hover:text-black"
+              >
+                <ChevronRightIcon className="h-12 w-12 text-gray-600" />
+              </button>
+              <div className="absolute bottom-0 left-0 w-full flex justify-center py-2 space-x-2">
+                {room.pictures.map((_, index: number) => (
+                  <div
+                    key={index}
+                    title='Switch image'
+                    onClick={() => handleImageChange(index)}
+                    className={`w-2.5 h-2.5 bg-gray-400 rounded-full cursor-pointer ${index === currentImageIndex ? 'bg-yellow-500' : ''}`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <ul className="space-y-2">
-            <li>
-              <strong>Street:</strong> {room.street}, {room.number}
-            </li>
-            <li>
-              <strong>Rent Price:</strong> ${room.rentPrice}/month
-            </li>
-            <li>
-              <strong>Size:</strong> {room.size} m²
-            </li>
-            <li>
-              <strong>Availability:</strong> {room.isRented ? 'Rented' : 'Available'}
-            </li>
-            <li>
-              <strong>Description:</strong> {room.description}
-            </li>
-          </ul>
+          {/* Thumbnails */}
+          <div className="hidden md:flex flex-col items-center ml-4 space-y-2 w-36 overflow-scroll">
+            {room.pictures?.map((thumbnail, index) => (
+              <button
+                key={index}
+                onClick={() => handleThumbnailClick(index)}
+                className={`w-38 h-64 rounded-lg border-none ${index === currentImageIndex ? 'opacity-80' : 'border-gray-300'
+                  }`}
+              >
+                <Image
+                  src={thumbnail}
+                  alt={`Thumbnail #${index + 1}`}
+                  width={240}
+                  height={140}
+                  quality={75}
+                  layout='contain'
+                  className='shadow-md shadow-gray-400 rounded-lg'
+                />
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Owner Details */}
-        <div className="w-full md:w-1/3 bg-white shadow rounded-lg p-4">
+        <div className="flex flex-col justify-evenly md:w-1/4 bg-gray-100 rounded-lg p-12 gap-x-4">
           <h2 className="text-lg font-bold mb-2">Owner Information</h2>
           <ul className="space-y-2">
             <li>
@@ -184,36 +179,74 @@ export default function RoomDetails() {
           </button>
         </div>
       </div>
+      {/* Room Details and Owner Section */}
+      <div className="flex flex-wrap mt-6 gap-y-2">
+        {/* Room Details */}
+        <div className="w-full bg-white shadow rounded-lg p-6 relative">
+          <ul className="block px-6">
+            <li>
+              <strong>Description</strong>
+            </li>
+            <li>
+              {room.description}
+            </li>
+          </ul>
+        </div>
+        <div className="w-full bg-white shadow rounded-lg p-6 relative grid grid-cols-3">
+          <ul className="block text-center">
+            <li>
+              <strong>Rent Price</strong>
+            </li>
+            <li>${room.rentPrice}/month</li>
+          </ul>
+          <ul className="block text-center">
+            <li>
+              <strong>Size</strong>
+            </li>
+            <li>{room.size} m²</li>
+          </ul>
+          <ul className="block text-center">
+            <li>
+              <strong>Availability</strong>
+            </li>
+            <li>
+              {room.isRented ? 'Rented' : 'Available'}
+            </li>
+          </ul>
+        </div>
+      </div>
 
       {/* Modal Dialog */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h3 className="text-lg font-bold mb-4">Send Interest</h3>
-            <textarea
-              className="w-full p-2 border rounded mb-4"
-              rows={4}
-              placeholder="Enter your message"
-              value={interestMessage}
-              onChange={(e) => setInterestMessage(e.target.value)}
-            />
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendInterest}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Send
-              </button>
+      {
+        showModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-lg font-bold mb-4">Send Interest</h3>
+              <textarea
+                className="w-full p-2 border rounded mb-4"
+                rows={4}
+                placeholder="Enter your message"
+                value={interestMessage}
+                onChange={(e) => setInterestMessage(e.target.value)}
+              />
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendInterest}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Send
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

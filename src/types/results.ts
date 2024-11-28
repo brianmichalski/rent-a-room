@@ -17,6 +17,7 @@ export interface RoomResult {
   ownerName: string;
   ownerCity: string;
   ownerPhone: string;
+  isFavorite?: boolean;
 }
 
 export interface CityResult {
